@@ -1,3 +1,3 @@
-## vite react 项目模板
+## ys-blog-admin
 
-use pnpm
+毕业设计博客后台管理
