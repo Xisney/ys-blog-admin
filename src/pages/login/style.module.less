@@ -1,0 +1,57 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #d2ebff;
+  :global {
+    .login-card {
+      width: 850px;
+      height: 550px;
+      background-color: #fff;
+      display: flex;
+      box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+      .login-form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        .login-title {
+          height: 190px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          color: #d2ebff;
+
+          h3 {
+            color: #61b7ff;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-size: 24px;
+            height: 40px;
+            line-height: 40px;
+          }
+        }
+        .login-input {
+          width: 300px;
+          align-self: center;
+          height: 350px;
+        }
+        .login-btn-item {
+          text-align: center;
+        }
+        .login-form-forgot {
+          float: right;
+        }
+        .login-form-button {
+          width: 200px;
+        }
+      }
+      img {
+        width: 290px;
+        height: 100%;
+      }
+    }
+  }
+}

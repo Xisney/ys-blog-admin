@@ -1,0 +1,46 @@
+.main-container {
+  min-height: 100vh;
+  :global {
+    .main-logo {
+      height: 32px;
+      margin: 16px 20px;
+      background: rgba(255, 255, 255, 0.3);
+      text-align: center;
+      line-height: 32px;
+      font-size: 20px;
+      color: #fff;
+      letter-spacing: 0.1em;
+      font-family: 'yu200';
+      text-overflow: clip;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .main-layout {
+      .main-header {
+        background: #fff;
+        padding: 0;
+        .trigger {
+          padding: 0 24px;
+          font-size: 18px;
+          line-height: 64px;
+          cursor: pointer;
+          transition: color 0.3s;
+          &:hover {
+            color: #1890ff;
+          }
+        }
+      }
+      .main-content {
+        margin: 24px 16px;
+        margin-bottom: 0;
+        position: relative;
+      }
+      .main-footer {
+        text-align: center;
+        padding: 12px;
+        font-family: 'yu200';
+      }
+    }
+  }
+}
