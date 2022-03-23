@@ -4,7 +4,7 @@ import style from './style.module.less'
 import { getHomePoemData } from '@src/api/home'
 import useGetData from '@src/hooks/useGetData'
 import { EditOutlined } from '@ant-design/icons'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 const { TextArea } = Input
 
@@ -12,7 +12,7 @@ const Home = () => {
   const [res, loading] = useGetData(getHomePoemData)
   const [editNoticeVisible, setEditNoticeVisible] = useState(false)
   const [notice, setNotice] = useState('公告内容测试')
-  const noticeTextRef = useRef<any>()
+  const [noticeText, setNoticeText] = useState(notice)
 
   return loading ? (
     <Loading />
@@ -54,11 +54,7 @@ const Home = () => {
             okText="确认修改"
             cancelText="取消"
             onOk={() => {
-              console.log(noticeTextRef.current.resizableTextArea.props.value)
-
-              setEditNoticeVisible(
-                noticeTextRef.current.resizableTextArea.props.value
-              )
+              setNotice(noticeText)
               setEditNoticeVisible(false)
             }}
           >
@@ -66,7 +62,10 @@ const Home = () => {
               className="home-notice-modal"
               defaultValue={notice}
               autoSize={{ minRows: 2, maxRows: 5 }}
-              ref={noticeTextRef}
+              value={noticeText}
+              onChange={e => {
+                setNoticeText(e.target.value)
+              }}
             />
           </Modal>
         </Card>
