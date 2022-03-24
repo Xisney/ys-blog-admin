@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 
-function useGetData<T = any>(
-  getData: () => Promise<T>
-): [T | undefined, boolean] {
-  const [data, setData] = useState<T>()
+interface GetData {
+  (): Promise<any>
+}
+
+function useGetData(getData: GetData[]): [any, boolean] {
+  const [data, setData] = useState<any>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
-    getData()
+
+    Promise.all(getData.map(f => f()))
       .then(res => {
         if (mounted) setData(res)
       })

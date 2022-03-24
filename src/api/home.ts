@@ -1,6 +1,7 @@
 import { load as poemApi } from 'jinrishici'
+import { httpRequest } from '.'
 
-interface PoemData {
+export interface PoemData {
   content: string
   title: string
   dynasty: string
@@ -23,4 +24,8 @@ export function getHomePoemData(): Promise<PoemData> {
       }
     )
   })
+}
+
+export function getHomeGroupData() {
+  return httpRequest('/about')
 }

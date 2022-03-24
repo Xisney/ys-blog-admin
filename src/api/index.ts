@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
-const BASE_URL = ''
+const BASE_URL = 'http://yapi.smart-xwork.cn/mock/137686/api/blog'
 
 const apiInstance = axios.create({
   baseURL: BASE_URL,
