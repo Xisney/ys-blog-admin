@@ -1,3 +1,18 @@
 .home-tag-list-card {
   width: 25%;
+  :global {
+    .home-tag-wrapper {
+      margin-top: 15px;
+      max-height: 290px;
+      overflow: auto;
+      &::-webkit-scrollbar {
+        width: 0px;
+      }
+    }
+
+    .home-tag-item {
+      margin-bottom: 15px;
+      user-select: none;
+    }
+  }
 }

@@ -107,7 +107,7 @@ const GroupListCard: FC<GroupListProps> = ({ data, setData }) => {
   }
 
   return (
-    <Card hoverable title="分组管理" className={style['home-group-list']}>
+    <Card hoverable title="分组管理" className={style['home-group-list-card']}>
       <Input.Group style={{ display: 'flex' }} compact>
         <Input
           prefix={<GroupOutlined className="home-icon" />}
@@ -122,6 +122,7 @@ const GroupListCard: FC<GroupListProps> = ({ data, setData }) => {
         </Button>
       </Input.Group>
       <List
+        className="home-group-list"
         dataSource={data}
         rowKey="id"
         renderItem={({ id, num, label }, i) => {

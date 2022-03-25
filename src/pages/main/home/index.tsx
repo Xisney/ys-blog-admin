@@ -1,9 +1,8 @@
 import Loading from '@src/components/loading'
-import { Card, Input, Button, List } from 'antd'
+import { Card } from 'antd'
 import style from './style.module.less'
 import { getHomeGroupData, getHomePoemData } from '@src/api/home'
 import useGetData from '@src/hooks/useGetData'
-import { TagOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import GroupPieChart from './components/groupPieChart'
 import GroupListCard from './components/groupListCard'
@@ -18,6 +17,11 @@ const Home = () => {
   const [listGroup, setListGroup] = useState([
     { label: 'React', id: 1, num: 10 },
     { label: 'Typescript', id: 2, num: 5 },
+  ])
+
+  const [listTag, setListTag] = useState([
+    { label: 'React', id: '1' },
+    { label: 'Vue', id: '2' },
   ])
 
   return loading ? (
@@ -39,7 +43,7 @@ const Home = () => {
           <GroupPieChart data={res[1]?.data.groupData} />
         </Card>
         <GroupListCard data={listGroup} setData={setListGroup} />
-        <TagListCard />
+        <TagListCard tags={listTag} setTags={setListTag} />
       </div>
     </div>
   )
