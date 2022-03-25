@@ -40,7 +40,7 @@ const Home = () => {
       />
       <div className="home-opt-row">
         <Card hoverable style={{ maxWidth: '45%', flex: 1 }}>
-          <GroupPieChart data={res[1]?.data.groupData} />
+          <GroupPieChart data={res[1]?.groupData} />
         </Card>
         <GroupListCard data={listGroup} setData={setListGroup} />
         <TagListCard tags={listTag} setTags={setListTag} />

@@ -13,7 +13,12 @@ function useGetData(getData: GetData[]): [any, boolean] {
 
     Promise.all(getData.map(f => f()))
       .then(res => {
-        if (mounted) setData(res)
+        if (mounted)
+          setData(
+            res.map(r => {
+              return r.data ? r.data : r
+            })
+          )
       })
       .catch(e => {
         console.log(e)
