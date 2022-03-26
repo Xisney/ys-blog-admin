@@ -20,13 +20,28 @@
       .main-header {
         background: #fff;
         padding: 0;
-        .trigger {
-          padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        .icon() {
           font-size: 18px;
-          line-height: 64px;
           cursor: pointer;
           transition: color 0.3s;
           &:hover {
+            color: #1890ff;
+          }
+        }
+        .trigger {
+          padding: 0 24px;
+          .icon();
+          line-height: 64px;
+        }
+        .header-opt-icons {
+          margin-right: 48px;
+          .custom-icon {
+            padding: 0 12px;
+            .icon();
+          }
+          .custom-icon-active {
             color: #1890ff;
           }
         }

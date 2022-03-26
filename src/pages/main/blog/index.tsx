@@ -1,8 +1,9 @@
 import { getBlogListData, BlogListData, tagAndGroupItem } from '@src/api/blog'
 import Loading from '@src/components/loading'
 import useGetData from '@src/hooks/useGetData'
-import { Table, Tag, Space, Button, Input } from 'antd'
-import { useMemo, useState } from 'react'
+import { Table, Tag, Space, Button, Input, InputRef } from 'antd'
+import Highlighter from 'react-highlight-words'
+import { useMemo, useRef } from 'react'
 import dayjs from 'dayjs'
 import { ColumnsType } from 'antd/es/table'
 import style from './style.module.less'
@@ -20,7 +21,7 @@ const Blog = () => {
   const [res, loading]: [[BlogListData], boolean] = useGetData([
     getBlogListData,
   ])
-  const [searchTitle, setSearchTitle] = useState('')
+  const searchTitleRef = useRef<InputRef>(null)
 
   const blogData = useMemo(() => {
     const blogList = res && res[0]
@@ -42,7 +43,14 @@ const Blog = () => {
         title: '文章名',
         dataIndex: 'title',
         render: (v: string) => {
-          return v
+          return (
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[searchTitleRef.current?.input!.value || '']}
+              autoEscape
+              textToHighlight={v}
+            />
+          )
         },
         filterDropdown: ({
           setSelectedKeys,
@@ -52,12 +60,16 @@ const Blog = () => {
         }) => (
           <div style={{ padding: 8 }}>
             <Input
-              placeholder={`搜索文章名`}
+              placeholder="搜索文章名"
               value={selectedKeys[0]}
               onChange={e =>
                 setSelectedKeys(e.target.value ? [e.target.value] : [])
               }
+              onPressEnter={() => {
+                confirm()
+              }}
               style={{ marginBottom: 8, display: 'block' }}
+              ref={searchTitleRef}
             />
             <Space>
               <Button
@@ -65,14 +77,20 @@ const Blog = () => {
                 icon={<SearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
+                onClick={() => {
+                  confirm()
+                }}
               >
                 Search
               </Button>
-              <Button size="small" style={{ width: 90 }}>
+              <Button
+                size="small"
+                style={{ width: 90 }}
+                onClick={() => {
+                  clearFilters?.()
+                }}
+              >
                 Reset
-              </Button>
-              <Button type="link" size="small" onClick={() => {}}>
-                Filter
               </Button>
             </Space>
           </div>
@@ -82,6 +100,11 @@ const Blog = () => {
         ),
         onFilter: (v, r) => {
           return r.title.includes(v as string)
+        },
+        onFilterDropdownVisibleChange: visible => {
+          if (visible) {
+            setTimeout(() => searchTitleRef.current?.select(), 100)
+          }
         },
       },
       {
@@ -154,7 +177,7 @@ const Blog = () => {
         },
       },
     ],
-    [res]
+    []
   )
 
   return loading ? (

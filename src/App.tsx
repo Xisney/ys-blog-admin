@@ -9,6 +9,7 @@ import Blog from './pages/main/blog'
 import Navigation from './pages/main/navigation'
 import About from './pages/main/about'
 import Draft from './pages/main/draft'
+import Write from './pages/main/write'
 
 const App = () => {
   return (
@@ -21,8 +22,9 @@ const App = () => {
           <Route path="navigation" element={<Navigation />} />
           <Route path="about" element={<About />} />
           <Route path="draft" element={<Draft />} />
+          <Route path="write" element={<Write />} />
         </Route>
-        <Route path="/login" element={<Login />} />
+        <Route path="login" element={<Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
