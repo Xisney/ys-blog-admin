@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { Layout, Menu, Popover, Tooltip } from 'antd'
+import { Button, Layout, Menu, Popconfirm, Space, Tooltip } from 'antd'
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -26,6 +26,10 @@ const Main = () => {
   const { pathname } = useLocation()
 
   const pathKey = useMemo(() => pathname.slice(1), [pathname])
+
+  const handleLogout = () => {
+    navigate('login')
+  }
 
   return (
     <Layout className={style['main-container']}>
@@ -79,9 +83,13 @@ const Main = () => {
                 }}
               />
             </Tooltip>
-            <Popover title="确认退出登录吗" trigger="click">
+            <Popconfirm
+              title="确认退出登录吗"
+              trigger="click"
+              onConfirm={handleLogout}
+            >
               <LogoutOutlined className="custom-icon" />
-            </Popover>
+            </Popconfirm>
           </div>
         </Header>
         <Content className="main-content">
