@@ -1,14 +1,14 @@
 import { httpRequest } from '.'
 
-export interface tagAndGroupItem {
+export interface TagAndGroupItem {
   label: string
   id: string
 }
 
 export interface BlogData {
   title: string
-  tags: tagAndGroupItem[]
-  group: tagAndGroupItem
+  tags: TagAndGroupItem[]
+  group: TagAndGroupItem
   publishTime: number
   viewCount: number
   id: string
