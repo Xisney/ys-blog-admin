@@ -6,6 +6,7 @@ import {
   GroupOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons'
+import cx from 'classnames'
 
 import style from './style.module.less'
 
@@ -18,11 +19,18 @@ interface ListItem {
 interface GroupListProps {
   data: ListItem[]
   setData: (data: ListItem[]) => void
+  className?: string
+  isNav?: boolean
 }
 
 const { confirm } = Modal
 
-const GroupListCard: FC<GroupListProps> = ({ data, setData }) => {
+const GroupListCard: FC<GroupListProps> = ({
+  data,
+  setData,
+  className,
+  isNav,
+}) => {
   const [newGroupLabel, setNewGroupLabel] = useState('')
   const [editGroupIndex, setEditGroupIndex] = useState(-1)
 
@@ -72,7 +80,7 @@ const GroupListCard: FC<GroupListProps> = ({ data, setData }) => {
         return v
       })
     )
-    message.success('修改标签成功！')
+    message.success('修改分组成功！')
     setEditGroupIndex(-1)
   }
 
@@ -80,7 +88,9 @@ const GroupListCard: FC<GroupListProps> = ({ data, setData }) => {
     confirm({
       title: `确认删除 ${label} 分组吗？`,
       icon: <ExclamationCircleOutlined />,
-      content: '删除时请确保该分组下没有文章，否则将拒绝删除',
+      content: `删除时请确保该分组下没有 ${
+        isNav ? 'item' : '文章'
+      }，否则将拒绝删除`,
       centered: true,
       okType: 'danger',
       maskClosable: true,
@@ -107,7 +117,11 @@ const GroupListCard: FC<GroupListProps> = ({ data, setData }) => {
   }
 
   return (
-    <Card hoverable title="分组管理" className={style['home-group-list-card']}>
+    <Card
+      hoverable
+      title={isNav ? '导航分组管理' : '分组管理'}
+      className={cx(style['home-group-list-card'], className)}
+    >
       <Input.Group style={{ display: 'flex' }} compact>
         <Input
           prefix={<GroupOutlined className="home-icon" />}

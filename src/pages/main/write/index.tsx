@@ -1,17 +1,5 @@
-import { Editor } from '@bytemd/react'
 import { useState } from 'react'
 import { Select, Form, Input, Button, Space } from 'antd'
-
-import gfm from '@bytemd/plugin-gfm'
-import highlight from '@bytemd/plugin-highlight'
-import frontmatter from '@bytemd/plugin-frontmatter'
-import breaks from '@bytemd/plugin-breaks'
-import mediumZoom from '@bytemd/plugin-medium-zoom'
-import mermaid from '@bytemd/plugin-mermaid'
-
-import zh from 'bytemd/locales/zh_Hans.json'
-import zh_gfm from '@bytemd/plugin-gfm/locales/zh_Hans.json'
-import zh_mermain from '@bytemd/plugin-mermaid/locales/zh_Hans.json'
 
 import 'github-markdown-css'
 import 'highlight.js/styles/github.css'
@@ -20,15 +8,7 @@ import style from './style.module.less'
 import useGetData from '@src/hooks/useGetData'
 import { getWriteTagsAndGroups, TagsAndGroupData } from '@src/api/write'
 import Loading from '@src/components/loading'
-
-const plugins: any = [
-  gfm({ locale: zh_gfm }),
-  highlight(),
-  frontmatter(),
-  breaks(),
-  mediumZoom(),
-  mermaid({ locale: zh_mermain }),
-]
+import MyEditor from './components'
 
 const Write = () => {
   const [res, loading]: [[TagsAndGroupData], boolean] = useGetData([
@@ -115,14 +95,7 @@ const Write = () => {
           </Form.Item>
         </Form>
       </div>
-      <Editor
-        value={blogvalue}
-        plugins={plugins}
-        onChange={v => {
-          setBlogValue(v)
-        }}
-        locale={zh}
-      />
+      <MyEditor value={blogvalue} onChange={setBlogValue} />
     </div>
   )
 }

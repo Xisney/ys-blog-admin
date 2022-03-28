@@ -10,6 +10,7 @@ import Navigation from './pages/main/navigation'
 import About from './pages/main/about'
 import Draft from './pages/main/draft'
 import Write from './pages/main/write'
+import Manage from './pages/main/navigation/manage'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="blog" element={<Blog />} />
           <Route path="comment" element={<Comment />} />
           <Route path="navigation" element={<Navigation />} />
+          <Route path="navigation/manage" element={<Manage />} />
           <Route path="about" element={<About />} />
           <Route path="draft" element={<Draft />} />
           <Route path="write" element={<Write />} />
