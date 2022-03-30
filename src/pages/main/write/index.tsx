@@ -6,14 +6,15 @@ import 'highlight.js/styles/github.css'
 import 'bytemd/dist/index.css'
 import style from './style.module.less'
 import useGetData from '@src/hooks/useGetData'
-import { getWriteTagsAndGroups, TagsAndGroupData } from '@src/api/write'
 import Loading from '@src/components/loading'
 import MyEditor from './components'
+import { getGroupAndTags, TagsAndGroupData } from '@src/api/common'
 
 const Write = () => {
   const [res, loading]: [[TagsAndGroupData], boolean] = useGetData([
-    getWriteTagsAndGroups,
+    getGroupAndTags,
   ])
+
   const [blogvalue, setBlogValue] = useState('')
   const [form] = Form.useForm()
 
@@ -59,8 +60,8 @@ const Write = () => {
               showSearch
               placeholder="为文章选择分组"
               optionFilterProp="label"
-              options={res[0].groups}
-              filterOption={(input, option) => {
+              options={res[0].data.groups}
+              filterOption={(input, option: any) => {
                 return option
                   ? option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                   : false
@@ -73,12 +74,12 @@ const Write = () => {
               placeholder="为文章选择标签"
               mode="multiple"
               optionFilterProp="label"
-              filterOption={(input, option) => {
+              filterOption={(input, option: any) => {
                 return option
                   ? option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
                   : false
               }}
-              options={res[0].tags}
+              options={res[0].data.tags}
               fieldNames={{ label: 'label', value: 'id' }}
               maxTagCount="responsive"
             />

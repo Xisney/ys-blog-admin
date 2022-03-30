@@ -1,5 +1,5 @@
 import { load as poemApi } from 'jinrishici'
-import { httpRequest } from '.'
+import { httpPostJsonRequest, httpRequest } from '.'
 
 export interface PoemData {
   content: string
@@ -26,6 +26,10 @@ export function getHomePoemData(): Promise<PoemData> {
   })
 }
 
-export function getHomeGroupData() {
-  return httpRequest('/about')
+export function getBaseData() {
+  return httpRequest('baseInfo')
+}
+
+export function updateNotice(value: { data: string }) {
+  return httpPostJsonRequest('updateNotice', value)
 }

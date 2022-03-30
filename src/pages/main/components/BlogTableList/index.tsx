@@ -26,7 +26,7 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
   const blogData = useMemo(() => {
     const blogList = data
 
-    return blogList.dataList
+    return blogList.data
       .map(({ title, publishTime, tags, group, id }) => ({
         title,
         publishTime,

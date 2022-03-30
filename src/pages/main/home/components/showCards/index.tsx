@@ -10,7 +10,7 @@ interface ShowCardsProps {
   viewCount: number
   blogNum: number
   runDays: number
-  lastModify: number
+  lastModify: string
 }
 
 const ShowCards: FC<ShowCardsProps> = ({
@@ -28,7 +28,7 @@ const ShowCards: FC<ShowCardsProps> = ({
         <h2 className="home-number-box">{blogNum}</h2>
       </Card>
       <Card className="home-card-show" title="运行时间(天)" hoverable>
-        <h2 className="home-number-box">{runDays}</h2>
+        <h2 className="home-number-box">{dayjs(runDays).toNow(true)}</h2>
       </Card>
       <Card className="home-card-show" title="上次活动时间" hoverable>
         <h2 className="home-number-box">{dayjs(lastModify).fromNow()}</h2>

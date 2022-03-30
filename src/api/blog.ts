@@ -2,7 +2,7 @@ import { httpRequest } from '.'
 
 export interface TagAndGroupItem {
   label: string
-  id: string
+  id: number
 }
 
 export interface BlogData {
@@ -17,9 +17,9 @@ export interface BlogData {
 
 export interface BlogListData {
   listTotalPage: number
-  dataList: BlogData[]
+  data: BlogData[]
 }
 
 export function getBlogListData() {
-  return httpRequest('/list')
+  return httpRequest('/blogList')
 }

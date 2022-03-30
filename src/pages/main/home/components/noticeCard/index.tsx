@@ -1,7 +1,8 @@
 import { useState, FC } from 'react'
-import { Card, Modal, Input } from 'antd'
+import { Card, Modal, Input, message } from 'antd'
 import style from './style.module.less'
 import { EditOutlined } from '@ant-design/icons'
+import { updateNotice } from '@src/api/home'
 
 const { TextArea } = Input
 
@@ -13,6 +14,20 @@ const NoticeCard: FC<NoticeCardProps> = ({ originNotice }) => {
   const [editNoticeVisible, setEditNoticeVisible] = useState(false)
   const [notice, setNotice] = useState(originNotice)
   const [noticeText, setNoticeText] = useState(notice)
+  const [confireLoading, setConfirmLoading] = useState(false)
+
+  const handleChangeNotice = async () => {
+    const {
+      data: { code },
+    } = await updateNotice({ data: noticeText })
+    if (code === -1) {
+      message.error('服务异常，更新公告失败')
+    } else {
+      message.success('更新公告成功')
+      setNotice(noticeText)
+    }
+    setEditNoticeVisible(false)
+  }
 
   return (
     <Card
@@ -38,10 +53,8 @@ const NoticeCard: FC<NoticeCardProps> = ({ originNotice }) => {
         }}
         okText="确认修改"
         cancelText="取消"
-        onOk={() => {
-          setNotice(noticeText)
-          setEditNoticeVisible(false)
-        }}
+        onOk={handleChangeNotice}
+        confirmLoading={confireLoading}
       >
         <TextArea
           className="home-notice-modal-textArea"

@@ -2,6 +2,7 @@ import { Card, Input, Button, Tag, Modal, message } from 'antd'
 import { TagOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import style from './style.module.less'
 import { FC, memo, useState } from 'react'
+import { removeTag, updateTag } from '@src/api/common'
 
 const presetColor = [
   'magenta',
@@ -20,7 +21,7 @@ const colorCount = presetColor.length
 
 interface Tag {
   label: string
-  id: string
+  id: number
 }
 interface TagListCardProps {
   tags: Tag[]
@@ -34,7 +35,10 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
   const [editModalVisible, setEditModalVisible] = useState(false)
   const [editTagInfo, setEditTagInfo] = useState<Tag>()
 
-  const handleDeleteTag = (id: string, label: string) => {
+  const [changeLoading, setChangeLoading] = useState(false)
+  const [createLoading, setCreateLoading] = useState(false)
+
+  const handleDeleteTag = (id: number, label: string) => {
     confirm({
       title: `确认删除 ${label} 标签吗？`,
       icon: <ExclamationCircleOutlined />,
@@ -45,16 +49,12 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
       transitionName: '',
       onOk: async () => {
         try {
-          await new Promise<void>(resolve => {
-            setTimeout(() => {
-              setTags(
-                tags.filter(d => {
-                  return d.id !== id
-                })
-              )
-              resolve()
-            }, 2000)
-          })
+          const {
+            data: { code, data },
+          } = await removeTag({ id })
+
+          if (code === -1) throw data
+          setTags(tags.filter(v => v.id !== id))
           message.success(`成功删除 ${label} 标签`)
         } catch (e) {
           message.error(`服务异常${e}`)
@@ -68,25 +68,40 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
     return tags.findIndex(v => v.label === label) !== -1
   }
 
-  const handleAddTag = () => {
+  const handleAddTag = async () => {
     if (isRepeatTag(newTagLabel)) {
       message.warning('标签名重复，新建失败！')
       return
     }
+    if (newTagLabel === '') {
+      message.warning('标签名为空，新建失败！')
+      return
+    }
+    setCreateLoading(true)
 
-    setTags([
-      ...tags,
-      { label: newTagLabel, id: +tags[tags.length - 1].id + 1 + '' },
-    ])
+    const {
+      data: { data },
+    } = await updateTag({ label: newTagLabel })
+
+    setCreateLoading(false)
+    setTags([...tags, { label: newTagLabel, id: data }])
     message.success(`创建 ${newTagLabel} 成功`)
     setNewTagLabel('')
   }
 
-  const handleEditTag = () => {
-    if (isRepeatTag(editTagInfo!.label)) {
+  const handleEditTag = async () => {
+    if (!editTagInfo) return
+
+    if (isRepeatTag(editTagInfo.label)) {
       message.warning('已存在该标签！')
       return
     }
+    if (editTagInfo.label === '') {
+      message.warning('请输入标签名！')
+      return
+    }
+    setChangeLoading(true)
+    await updateTag(editTagInfo)
 
     setTags(
       tags.map(({ label, id }) => {
@@ -97,6 +112,7 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
         return { label, id }
       })
     )
+    setChangeLoading(false)
     setEditModalVisible(false)
     message.success('修改标签成功')
   }
@@ -108,11 +124,11 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
           prefix={<TagOutlined className="home-icon" />}
           value={newTagLabel}
           onChange={e => {
-            setNewTagLabel(e.target.value)
+            setNewTagLabel(e.target.value.trim())
           }}
           onPressEnter={handleAddTag}
         />
-        <Button type="primary" onClick={handleAddTag}>
+        <Button type="primary" onClick={handleAddTag} loading={createLoading}>
           新建标签
         </Button>
       </Input.Group>
@@ -147,11 +163,12 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
         }}
         onOk={handleEditTag}
         transitionName=""
+        confirmLoading={changeLoading}
       >
         <Input
           value={editTagInfo?.label || ''}
           onChange={e => {
-            setEditTagInfo({ ...editTagInfo!, label: e.target.value })
+            setEditTagInfo({ ...editTagInfo!, label: e.target.value.trim() })
           }}
           onPressEnter={handleEditTag}
         />
