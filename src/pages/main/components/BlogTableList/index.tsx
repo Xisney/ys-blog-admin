@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import { ColumnsType } from 'antd/es/table'
 import style from './style.module.less'
 import { SearchOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 
 interface TableRecord {
   title: string
@@ -27,15 +28,44 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
     const blogList = data
 
     return blogList.data
-      .map(({ title, publishTime, tags, group, id }) => ({
+      .map(({ title, publishTime, tags, group, id, description }) => ({
         title,
         publishTime,
         tags,
         group,
         id,
+        description,
       }))
       .sort((a, b) => b.publishTime - a.publishTime)
   }, [data])
+
+  const tagsFilter = useMemo(() => {
+    return blogData
+      .reduce((pre: string[], { tags }) => {
+        tags
+          .map(({ label }) => label)
+          .forEach(l => {
+            if (!pre.includes(l)) {
+              pre.push(l)
+            }
+          })
+        return pre
+      }, [])
+      .map(label => ({ value: label, text: label }))
+  }, [blogData])
+
+  const groupFilter = useMemo(() => {
+    return blogData
+      .reduce((pre: string[], { group }) => {
+        if (!pre.includes(group.label)) {
+          pre.push(group.label)
+        }
+        return pre
+      }, [])
+      .map(label => ({ value: label, text: label }))
+  }, [blogData])
+
+  const navigate = useNavigate()
 
   const columns: ColumnsType<TableRecord> = useMemo(
     () => [
@@ -122,16 +152,7 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
         render: (v: TagAndGroupItem) => {
           return <Tag color="#108ee9">{v.label}</Tag>
         },
-        filters: [
-          {
-            value: '学习笔记',
-            text: '学习笔记',
-          },
-          {
-            value: 'React实践',
-            text: 'React实践',
-          },
-        ],
+        filters: groupFilter,
         filterMultiple: false,
         onFilter: (value, r) => r.group.label === (value as string),
       },
@@ -149,16 +170,7 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
             )
           })
         },
-        filters: [
-          {
-            value: '学习笔记',
-            text: '学习笔记',
-          },
-          {
-            value: 'React实践',
-            text: 'React实践',
-          },
-        ],
+        filters: tagsFilter,
         onFilter: (value, r) => {
           return r.tags.map(t => t.label).includes(value as string)
         },
@@ -166,10 +178,16 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
       {
         title: '操作',
         key: 'opts',
-        render: () => {
+        render: (_, r) => {
           return (
             <Space size="middle" className="blog-opts">
-              <a>修改</a>
+              <a
+                onClick={() => {
+                  navigate('../write', { state: r })
+                }}
+              >
+                修改
+              </a>
               <Popconfirm title="确认删除吗？">
                 <a>删除</a>
               </Popconfirm>

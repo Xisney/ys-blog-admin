@@ -17,10 +17,7 @@ const Home = () => {
   const [res, loading] = useGetData([getHomePoemData, getBaseData])
   const [selfLoading, setSelfLoading] = useState(true)
 
-  const [listGroup, setListGroup] = useState([
-    { label: 'React', id: 1, num: 10 },
-    { label: 'Typescript', id: 2, num: 5 },
-  ])
+  const [listGroup, setListGroup] = useState<TagAndGroupItem[]>()
 
   const [listTag, setListTag] = useState<TagAndGroupItem[]>()
 
@@ -30,6 +27,7 @@ const Home = () => {
       if (!mounted) return
 
       setListTag(data.tags)
+      setListGroup(data.groups)
       setSelfLoading(false)
     })
     return () => {
@@ -61,7 +59,7 @@ const Home = () => {
             ]}
           />
         </Card>
-        <GroupListCard data={listGroup} setData={setListGroup} />
+        <GroupListCard data={listGroup || []} setData={setListGroup} />
         <TagListCard tags={listTag || []} setTags={setListTag} />
       </div>
     </div>

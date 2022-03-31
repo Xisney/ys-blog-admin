@@ -80,13 +80,17 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
     setCreateLoading(true)
 
     const {
-      data: { data },
+      data: { data, code },
     } = await updateTag({ label: newTagLabel })
 
+    if (code === -1) {
+      message.error('服务异常，创建标签失败')
+    } else {
+      setTags([...tags, { label: newTagLabel, id: data }])
+      message.success(`创建 ${newTagLabel} 成功`)
+      setNewTagLabel('')
+    }
     setCreateLoading(false)
-    setTags([...tags, { label: newTagLabel, id: data }])
-    message.success(`创建 ${newTagLabel} 成功`)
-    setNewTagLabel('')
   }
 
   const handleEditTag = async () => {
@@ -101,20 +105,28 @@ const TagListCard: FC<TagListCardProps> = ({ tags, setTags }) => {
       return
     }
     setChangeLoading(true)
-    await updateTag(editTagInfo)
 
-    setTags(
-      tags.map(({ label, id }) => {
-        if (id === editTagInfo?.id) {
-          return { id, label: editTagInfo.label }
-        }
+    const {
+      data: { code },
+    } = await updateTag(editTagInfo)
 
-        return { label, id }
-      })
-    )
+    if (code === -1) {
+      message.error('服务异常，修改标签失败')
+    } else {
+      setTags(
+        tags.map(({ label, id }) => {
+          if (id === editTagInfo?.id) {
+            return { id, label: editTagInfo.label }
+          }
+
+          return { label, id }
+        })
+      )
+      message.success('修改标签成功')
+      setEditModalVisible(false)
+    }
+
     setChangeLoading(false)
-    setEditModalVisible(false)
-    message.success('修改标签成功')
   }
 
   return (

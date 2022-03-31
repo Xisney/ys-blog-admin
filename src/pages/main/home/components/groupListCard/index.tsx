@@ -9,11 +9,12 @@ import {
 import cx from 'classnames'
 
 import style from './style.module.less'
+import { removeGroup, updateGroup } from '@src/api/common'
 
 interface ListItem {
   label: string
   id: number
-  num: number
+  num?: number
 }
 
 interface GroupListProps {
@@ -25,6 +26,8 @@ interface GroupListProps {
 
 const { confirm } = Modal
 
+const changeMesKey = 'homeGroupChange'
+
 const GroupListCard: FC<GroupListProps> = ({
   data,
   setData,
@@ -34,11 +37,13 @@ const GroupListCard: FC<GroupListProps> = ({
   const [newGroupLabel, setNewGroupLabel] = useState('')
   const [editGroupIndex, setEditGroupIndex] = useState(-1)
 
+  const [createLoading, setCreateLoading] = useState(false)
+
   const isGroupRepeat = (newLabel: string) => {
     return data.findIndex(v => v.label === newLabel) !== -1
   }
 
-  const handleAddGroup = () => {
+  const handleAddGroup = async () => {
     if (isGroupRepeat(newGroupLabel)) {
       message.warning('分组名重复，新建分组失败！')
       return
@@ -49,19 +54,29 @@ const GroupListCard: FC<GroupListProps> = ({
       return
     }
 
-    setData([
-      ...data,
-      {
-        label: newGroupLabel,
-        id: data[data.length - 1] ? data[data.length - 1].id + 1 : 1,
-        num: 0,
-      },
-    ])
-    message.success('新建分组成功！')
-    setNewGroupLabel('')
+    setCreateLoading(true)
+    const {
+      data: { code, newId },
+    } = await updateGroup({ label: newGroupLabel })
+
+    if (code === -1) {
+      message.error('服务异常，新建分组失败')
+    } else {
+      setData([
+        ...data,
+        {
+          label: newGroupLabel,
+          id: newId,
+          num: 0,
+        },
+      ])
+      message.success('新建分组成功！')
+      setNewGroupLabel('')
+    }
+    setCreateLoading(false)
   }
 
-  const handleEditGroup = (e: any, id: number) => {
+  const handleEditGroup = async (e: any, id: number) => {
     const newGroupLabel = e.target.value
     if (isGroupRepeat(newGroupLabel)) {
       message.warning('分组名重复，修改分组失败！')
@@ -69,18 +84,28 @@ const GroupListCard: FC<GroupListProps> = ({
       return
     }
 
-    setData(
-      data.map(v => {
-        if (v.id === id) {
-          return {
-            ...v,
-            label: newGroupLabel,
+    message.loading({ content: '修改中...', key: changeMesKey })
+
+    const {
+      data: { code },
+    } = await updateGroup({ id, label: newGroupLabel })
+
+    if (code === -1) {
+      message.error({ content: '服务异常，修改分组失败', key: changeMesKey })
+    } else {
+      setData(
+        data.map(v => {
+          if (v.id === id) {
+            return {
+              ...v,
+              label: newGroupLabel,
+            }
           }
-        }
-        return v
-      })
-    )
-    message.success('修改分组成功！')
+          return v
+        })
+      )
+      message.success({ content: '修改分组成功！', key: changeMesKey })
+    }
     setEditGroupIndex(-1)
   }
 
@@ -97,16 +122,16 @@ const GroupListCard: FC<GroupListProps> = ({
       transitionName: '',
       onOk: async () => {
         try {
-          await new Promise<void>(resolve => {
-            setTimeout(() => {
-              setData(
-                data.filter(d => {
-                  return d.id !== id
-                })
-              )
-              resolve()
-            }, 2000)
-          })
+          const {
+            data: { code },
+          } = await removeGroup({ id })
+          if (code === -1) throw ' 删除分组失败'
+
+          setData(
+            data.filter(d => {
+              return d.id !== id
+            })
+          )
           message.success(`成功删除 ${label} 分组`)
         } catch (e) {
           message.error(`服务异常${e}`)
@@ -131,7 +156,7 @@ const GroupListCard: FC<GroupListProps> = ({
             setNewGroupLabel(e.target.value.trim())
           }}
         />
-        <Button type="primary" onClick={handleAddGroup}>
+        <Button type="primary" onClick={handleAddGroup} loading={createLoading}>
           新建分组
         </Button>
       </Input.Group>
@@ -143,7 +168,7 @@ const GroupListCard: FC<GroupListProps> = ({
           return (
             <List.Item className="home-list-item">
               <div className="home-list-text">
-                <span className="home-list-num">{num}</span>
+                <span className="home-list-num">{num || 0}</span>
                 {editGroupIndex === i ? (
                   <Input
                     onBlur={e => {

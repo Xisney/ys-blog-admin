@@ -14,9 +14,10 @@ const NoticeCard: FC<NoticeCardProps> = ({ originNotice }) => {
   const [editNoticeVisible, setEditNoticeVisible] = useState(false)
   const [notice, setNotice] = useState(originNotice)
   const [noticeText, setNoticeText] = useState(notice)
-  const [confireLoading, setConfirmLoading] = useState(false)
+  const [confirmLoading, setConfirmLoading] = useState(false)
 
   const handleChangeNotice = async () => {
+    setConfirmLoading(true)
     const {
       data: { code },
     } = await updateNotice({ data: noticeText })
@@ -27,6 +28,7 @@ const NoticeCard: FC<NoticeCardProps> = ({ originNotice }) => {
       setNotice(noticeText)
     }
     setEditNoticeVisible(false)
+    setConfirmLoading(false)
   }
 
   return (
@@ -54,10 +56,10 @@ const NoticeCard: FC<NoticeCardProps> = ({ originNotice }) => {
         okText="确认修改"
         cancelText="取消"
         onOk={handleChangeNotice}
-        confirmLoading={confireLoading}
+        confirmLoading={confirmLoading}
       >
         <TextArea
-          className="home-notice-modal-textArea"
+          className="modal-textArea"
           defaultValue={notice}
           autoSize={{ minRows: 2, maxRows: 5 }}
           value={noticeText}

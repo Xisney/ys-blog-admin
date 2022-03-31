@@ -20,3 +20,11 @@ export function updateTag(data: { id?: number; label: string }) {
 export function removeTag(data: { id: number }) {
   return httpPostJsonRequest('removeTag', data)
 }
+
+export function updateGroup(data: { id?: number; label: string }) {
+  return httpPostJsonRequest('updateGroup', data)
+}
+
+export function removeGroup(data: { id: number }) {
+  return httpPostJsonRequest('removeGroup', data)
+}
