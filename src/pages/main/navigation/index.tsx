@@ -147,7 +147,12 @@ const Navigation = () => {
           setEditModalVisible(false)
         }}
       >
-        <NavItemForm form={form} />
+        <NavItemForm
+          form={form}
+          selectOptions={
+            res?.map(({ id, name }) => ({ id, label: name })) || []
+          }
+        />
       </Modal>
     </div>
   )

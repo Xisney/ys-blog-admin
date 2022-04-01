@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Form, message } from 'antd'
 import GroupListCard from '../../home/components/groupListCard'
 import NavItemForm from '../components/navItemForm'
@@ -10,8 +10,6 @@ const Manage = () => {
   const [loading, setLoading] = useState(true)
   const [form] = Form.useForm()
   const [data, setNavData] = useState<NavGroup[]>()
-
-  const updateFormRef = useRef<(data: NavGroup[]) => void>(() => {})
 
   useEffect(() => {
     getNavigationGroupData()
@@ -32,7 +30,11 @@ const Manage = () => {
   ) : (
     <div className={style['manage-container']}>
       <div className="manage-form-wrapper">
-        <NavItemForm form={form} isAdd apisRef={updateFormRef} />
+        <NavItemForm
+          form={form}
+          isAdd
+          selectOptions={data?.map(({ id, label }) => ({ id, label })) || []}
+        />
       </div>
       <GroupListCard
         data={
@@ -43,13 +45,13 @@ const Manage = () => {
           })) || []
         }
         setData={items => {
-          const update = items.map(({ id, label, blogNum }) => ({
-            id,
-            label,
-            count: blogNum,
-          }))
-          setNavData(update)
-          updateFormRef.current(update)
+          setNavData(
+            items.map(({ id, label, blogNum }) => ({
+              id,
+              label,
+              count: blogNum,
+            }))
+          )
         }}
         className="manage-group-card"
         isNav
