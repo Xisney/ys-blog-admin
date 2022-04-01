@@ -4,7 +4,7 @@ interface GetData {
   (): Promise<any>
 }
 
-function useGetData(getData: GetData[]): [any, boolean] {
+function useGetData(getData: GetData[]): [any, boolean, any] {
   const [data, setData] = useState<any>()
   const [loading, setLoading] = useState(true)
 
@@ -32,7 +32,7 @@ function useGetData(getData: GetData[]): [any, boolean] {
     }
   }, [])
 
-  return [data, loading]
+  return [data, loading, setData]
 }
 
 export default useGetData

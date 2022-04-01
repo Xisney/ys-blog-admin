@@ -13,11 +13,15 @@ import TagListCard from './components/tagListCard'
 import { getGroupAndTags } from '@src/api/common'
 import { TagAndGroupItem } from '@src/api/blog'
 
+interface ListGroupData extends TagAndGroupItem {
+  blogNum: number
+}
+
 const Home = () => {
   const [res, loading] = useGetData([getHomePoemData, getBaseData])
   const [selfLoading, setSelfLoading] = useState(true)
 
-  const [listGroup, setListGroup] = useState<TagAndGroupItem[]>()
+  const [listGroup, setListGroup] = useState<ListGroupData[]>()
 
   const [listTag, setListTag] = useState<TagAndGroupItem[]>()
 
@@ -45,18 +49,21 @@ const Home = () => {
       </div>
       <ShowCards
         viewCount={res[1].data.viewCount}
-        blogNum={24}
+        blogNum={res[1].data.blogCount}
         runDays={res[1].data.startTime}
         lastModify={res[1].data.lastModify}
       />
       <div className="home-opt-row">
         <Card hoverable style={{ maxWidth: '45%', flex: 1 }}>
           <GroupPieChart
-            data={[
-              { value: 20, name: '现代哲学' },
-              { value: 31, name: 'React深入' },
-              { value: 3, name: '现代前端构建工具' },
-            ]}
+            data={
+              listGroup
+                ?.filter(({ blogNum }) => blogNum)
+                .map(({ label, blogNum }) => ({
+                  name: label,
+                  value: blogNum,
+                })) || []
+            }
           />
         </Card>
         <GroupListCard data={listGroup || []} setData={setListGroup} />

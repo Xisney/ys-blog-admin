@@ -1,4 +1,4 @@
-import { httpRequest } from '.'
+import { httpPostJsonRequest, httpRequest } from '.'
 
 export interface TagAndGroupItem {
   label: string
@@ -11,15 +11,19 @@ export interface BlogData {
   group: TagAndGroupItem
   publishTime: number
   viewCount: number
-  id: string
+  id: number
   description: string
 }
 
 export interface BlogListData {
-  listTotalPage: number
+  code: number
   data: BlogData[]
 }
 
 export function getBlogListData() {
   return httpRequest('/blogList')
+}
+
+export function deleteBlog(data: { id: number }) {
+  return httpPostJsonRequest('deleteBlog', data)
 }

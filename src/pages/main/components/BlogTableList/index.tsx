@@ -1,5 +1,14 @@
-import { BlogListData, TagAndGroupItem } from '@src/api/blog'
-import { Table, Tag, Space, Button, Input, InputRef, Popconfirm } from 'antd'
+import { BlogListData, deleteBlog, TagAndGroupItem } from '@src/api/blog'
+import {
+  Table,
+  Tag,
+  Space,
+  Button,
+  Input,
+  InputRef,
+  Popconfirm,
+  message,
+} from 'antd'
 import Highlighter from 'react-highlight-words'
 import { useMemo, useRef, FC } from 'react'
 import dayjs from 'dayjs'
@@ -13,15 +22,16 @@ interface TableRecord {
   publishTime: number
   tags: TagAndGroupItem[]
   group: TagAndGroupItem
-  id: string
+  id: number
 }
 
 interface BlogListProps {
   data: BlogListData
   isDraft?: boolean
+  setData: (data: any) => void
 }
 
-const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
+const BlogTableList: FC<BlogListProps> = ({ data, isDraft, setData }) => {
   const searchTitleRef = useRef<InputRef>(null)
 
   const blogData = useMemo(() => {
@@ -36,7 +46,10 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
         id,
         description,
       }))
-      .sort((a, b) => b.publishTime - a.publishTime)
+      .sort(
+        (a, b) =>
+          new Date(b.publishTime).getTime() - new Date(a.publishTime).getTime()
+      )
   }, [data])
 
   const tagsFilter = useMemo(() => {
@@ -144,7 +157,8 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
           return dayjs(v).format('YYYY-MM-DD HH:mm:ss')
         },
         sortDirections: ['ascend'],
-        sorter: (a: any, b: any) => a.publishTime - b.publishTime,
+        sorter: (a: any, b: any) =>
+          new Date(a.publishTime).getTime() - new Date(b.publishTime).getTime(),
       },
       {
         title: '文章分组',
@@ -188,7 +202,33 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft }) => {
               >
                 修改
               </a>
-              <Popconfirm title="确认删除吗？">
+              <Popconfirm
+                title="确认删除吗？"
+                onConfirm={async () => {
+                  message.loading({ content: '操作中', key: 'blogDelete' })
+                  const {
+                    data: { code },
+                  } = await deleteBlog({ id: r.id })
+
+                  if (code === -1) {
+                    message.error({
+                      content: '服务异常，删除文章失败',
+                      key: 'blogDelete',
+                    })
+                  } else {
+                    message.success({
+                      content: '成功删除文章',
+                      key: 'blogDelete',
+                    })
+                    setData([
+                      {
+                        code: data.code,
+                        data: data.data.filter(({ id }) => id !== r.id),
+                      },
+                    ])
+                  }
+                }}
+              >
                 <a>删除</a>
               </Popconfirm>
               {!isDraft && <a>阅读</a>}

@@ -1,6 +1,6 @@
 import { httpRequest, httpPostJsonRequest } from '.'
 
-interface blogData {
+export interface BlogData {
   id?: number
   title: string
   content: string
@@ -11,7 +11,7 @@ interface blogData {
   tags: number[]
 }
 
-export function updateBlog(data: blogData) {
+export function updateBlog(data: BlogData) {
   return httpPostJsonRequest('updateBlog', data)
 }
 

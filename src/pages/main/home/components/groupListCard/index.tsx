@@ -14,7 +14,7 @@ import { removeGroup, updateGroup } from '@src/api/common'
 interface ListItem {
   label: string
   id: number
-  num?: number
+  blogNum: number
 }
 
 interface GroupListProps {
@@ -67,7 +67,7 @@ const GroupListCard: FC<GroupListProps> = ({
         {
           label: newGroupLabel,
           id: newId,
-          num: 0,
+          blogNum: 0,
         },
       ])
       message.success('新建分组成功！')
@@ -164,11 +164,11 @@ const GroupListCard: FC<GroupListProps> = ({
         className="home-group-list"
         dataSource={data}
         rowKey="id"
-        renderItem={({ id, num, label }, i) => {
+        renderItem={({ id, blogNum, label }, i) => {
           return (
             <List.Item className="home-list-item">
               <div className="home-list-text">
-                <span className="home-list-num">{num || 0}</span>
+                <span className="home-list-num">{blogNum}</span>
                 {editGroupIndex === i ? (
                   <Input
                     onBlur={e => {

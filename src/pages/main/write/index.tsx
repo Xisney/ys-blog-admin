@@ -1,5 +1,14 @@
-import { useEffect, useState } from 'react'
-import { Select, Form, Input, Button, Space, message, Modal } from 'antd'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Select,
+  Form,
+  Input,
+  Button,
+  Space,
+  message,
+  Modal,
+  Popconfirm,
+} from 'antd'
 
 import 'github-markdown-css'
 import 'highlight.js/styles/github.css'
@@ -11,24 +20,53 @@ import MyEditor from './components'
 import { getGroupAndTags, TagsAndGroupData } from '@src/api/common'
 import { getBlogContent, updateBlog } from '@src/api/write'
 import { useLocation } from 'react-router-dom'
+import { cacheBlog, clearCacheBlog, getBlogCache, targetKeys } from './utils'
 
 const { TextArea } = Input
 
 const Write = () => {
-  const [res, loading]: [[TagsAndGroupData], boolean] = useGetData([
+  const [res, loading]: [[TagsAndGroupData], boolean, any] = useGetData([
     getGroupAndTags,
   ])
   const [selfLoading, setSelfLoading] = useState(true)
-  const [isPublished, setIsPublished] = useState(false)
+  const [publishLock, setPublishLock] = useState(false)
 
+  const blogIdRef = useRef()
   const { state }: { state: any } = useLocation()
+
+  const hasPubOrSaveRef = useRef(false)
   useEffect(() => {
     if (!state) {
       setSelfLoading(false)
-      return
+      const cache = getBlogCache()
+      if (cache) {
+        form.setFields([
+          { name: 'title', value: cache.title },
+          {
+            name: 'group',
+            value: cache.group,
+          },
+          {
+            name: 'tags',
+            value: cache.tags,
+          },
+        ])
+        setBlogValue(cache.content)
+        SetDes({ content: cache.description, origin: cache.description })
+      }
+      return () => {
+        if (!hasPubOrSaveRef.current) {
+          cacheBlog({
+            ...form.getFieldsValue(targetKeys),
+            content: getBlogValueRef.current().blogvalue,
+            description: getBlogValueRef.current().des,
+          })
+        }
+      }
     }
 
     const id = state.id
+    blogIdRef.current = id
     form.setFields([
       { name: 'title', value: state.title },
       {
@@ -59,54 +97,48 @@ const Write = () => {
   const [blogvalue, setBlogValue] = useState('')
   const [form] = Form.useForm()
 
-  const [pubLoading, setPubLoading] = useState(false)
-  const [savaLoading, setSaveLoading] = useState(false)
-
   const [desModalVisible, setDesModalVisible] = useState(false)
   const [des, SetDes] = useState({ origin: '', content: '' })
 
+  const getBlogValueRef = useRef<any>()
+
+  useEffect(() => {
+    getBlogValueRef.current = () => {
+      return { blogvalue, des: des.content }
+    }
+  }, [des, blogvalue])
+
   const changeData = async (value: any, isDraft: boolean) => {
-    if (isPublished) {
-      message.warning(`本文已${isDraft ? '保存' : '发布'}，无需重复操作`)
+    if (value.tags.length > 3) {
+      message.warning('标签至多选择三个，请重新选择标签')
       return
     }
 
+    if (publishLock) {
+      message.warning(`操作进行中，请勿重复操作`)
+      return
+    }
+
+    setPublishLock(true)
     const {
-      data: { code },
+      data: { code, data },
     } = await updateBlog({
       ...value,
       description: des.content,
       content: blogvalue,
       isDraft,
       viewCount: 0,
+      id: blogIdRef.current,
     })
     if (code === -1) {
       message.error('服务异常，发布文章失败')
     } else {
+      blogIdRef.current = data
       message.success(`${isDraft ? '暂存' : '发布'}文章成功`)
-      setIsPublished(true)
+      clearCacheBlog()
+      hasPubOrSaveRef.current = true
     }
-  }
-
-  const handleSubmit = async (values: any) => {
-    try {
-      setPubLoading(true)
-      await changeData(values, false)
-    } catch (e) {
-    } finally {
-      setPubLoading(false)
-    }
-  }
-
-  const handleSave = async () => {
-    try {
-      const value = await form.validateFields()
-      setSaveLoading(true)
-      await changeData(value, true)
-    } catch (e) {
-    } finally {
-      setSaveLoading(false)
-    }
+    setPublishLock(false)
   }
 
   return loading || selfLoading ? (
@@ -119,7 +151,6 @@ const Write = () => {
           autoComplete="off"
           style={{ justifyContent: 'space-between' }}
           form={form}
-          onFinish={handleSubmit}
         >
           <Form.Item
             label="文章标题"
@@ -165,17 +196,30 @@ const Write = () => {
           </Form.Item>
           <Form.Item style={{ flex: 1 }}>
             <Space>
-              <Button
-                type="primary"
-                danger
-                htmlType="submit"
-                loading={pubLoading}
+              <Popconfirm
+                title={`确认${
+                  blogIdRef.current === undefined ? '发布' : '修改并发布'
+                }文章吗`}
+                onConfirm={async () => {
+                  const value = await form.validateFields()
+                  await changeData(value, false)
+                }}
               >
-                发布
-              </Button>
-              <Button type="primary" onClick={handleSave} loading={savaLoading}>
-                暂存
-              </Button>
+                <Button type="primary" danger>
+                  发布
+                </Button>
+              </Popconfirm>
+              <Popconfirm
+                title={`确认${
+                  blogIdRef.current === undefined ? '暂存' : '修改并暂存'
+                }文章吗`}
+                onConfirm={async () => {
+                  const value = await form.validateFields()
+                  await changeData(value, true)
+                }}
+              >
+                <Button type="primary">暂存</Button>
+              </Popconfirm>
               <Button
                 type="dashed"
                 onClick={() => {
