@@ -5,6 +5,7 @@ export const route2ActiveMenu: Record<string, string> = {
   blog: '2',
   comment: '3',
   navigation: '4',
+  'navigation/manage': '4',
   about: '5',
   draft: '6',
   write: customWriteActive,

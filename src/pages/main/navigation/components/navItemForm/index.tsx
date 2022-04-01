@@ -1,17 +1,51 @@
+import { getNavigationGroupData, NavGroup } from '@src/api/navgation'
 import { debouce } from '@src/utils'
-import { Form, Input, Avatar, Select, FormInstance, Button } from 'antd'
-import { FC, useState } from 'react'
+import {
+  Form,
+  Input,
+  Avatar,
+  Select,
+  FormInstance,
+  Button,
+  message,
+} from 'antd'
+import {
+  FC,
+  MutableRefObject,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react'
 
 interface NavItemFormProps {
   form: FormInstance<any>
   isAdd?: boolean
+  apisRef?: MutableRefObject<(data: NavGroup[]) => void>
 }
 
-const NavItemForm: FC<NavItemFormProps> = ({ form, isAdd }) => {
+const NavItemForm: FC<NavItemFormProps> = ({ form, isAdd, apisRef }) => {
   const [iconSrc, setIconSrc] = useState('')
   const handleIconSrcChange = debouce((e: any) => {
     setIconSrc(e.target.value)
   })
+
+  const [selectOptions, setSelectOptions] = useState<NavGroup[]>()
+  const [selectLoading, setSelectLoading] = useState(true)
+  useEffect(() => {
+    getNavigationGroupData()
+      .then(({ data: { code, data } }) => {
+        if (code === -1) throw '服务异常'
+        setSelectOptions(data)
+      })
+      .catch(e => {
+        message.error(e)
+      })
+      .finally(() => {
+        setSelectLoading(false)
+      })
+  }, [])
+
+  useImperativeHandle(apisRef, () => setSelectOptions, [])
 
   return (
     <Form layout="vertical" form={form} autoComplete="off">
@@ -64,13 +98,8 @@ const NavItemForm: FC<NavItemFormProps> = ({ form, isAdd }) => {
           filterOption={(input, option) =>
             option!.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
           }
-          options={[
-            {
-              label: 's',
-              id: '1',
-            },
-            { label: 'f', id: '2' },
-          ]}
+          options={selectOptions}
+          loading={selectLoading}
         />
       </Form.Item>
       {isAdd && (

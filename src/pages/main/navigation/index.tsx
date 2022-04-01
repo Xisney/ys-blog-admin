@@ -1,9 +1,18 @@
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { getNavigationData, NavsData, NavItem } from '@src/api/navgation'
+import { getNavigationData, NavItem, NavsData } from '@src/api/navgation'
 import Loading from '@src/components/loading'
-import useGetData from '@src/hooks/useGetData'
-import { Card, Avatar, Tabs, Popconfirm, Form, Modal, Button } from 'antd'
-import { useMemo, useState } from 'react'
+import {
+  Card,
+  Avatar,
+  Tabs,
+  Popconfirm,
+  Form,
+  Modal,
+  Button,
+  Empty,
+  message,
+} from 'antd'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavItemForm from './components/navItemForm'
 import style from './style.module.less'
@@ -12,14 +21,28 @@ const { Meta } = Card
 const { TabPane } = Tabs
 
 const Navigation = () => {
-  const [res, loading]: [[NavsData[]], boolean] = useGetData([
-    getNavigationData,
-  ])
+  const [loading, setLoading] = useState(true)
+  const [res, setRes] = useState<NavsData[]>()
+
+  useEffect(() => {
+    getNavigationData()
+      .then(({ data: { code, data } }) => {
+        if (code === -1) throw '服务异常'
+        setRes(data)
+      })
+      .catch(e => {
+        message.error(e)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
   const navigate = useNavigate()
   const [editModalVisible, setEditModalVisible] = useState(false)
   const [form] = Form.useForm()
 
-  const handleDelete = (id: string) => {}
+  const handleDelete = (id: number) => {}
 
   const handleEdit = (n: NavItem) => {
     setEditModalVisible(true)
@@ -50,7 +73,6 @@ const Navigation = () => {
 
   const renderTabs = useMemo(() => {
     if (!res) return ''
-
     return (
       <Tabs
         animated
@@ -67,39 +89,43 @@ const Navigation = () => {
           ),
         }}
       >
-        {res[0].map((v, i) => (
-          <TabPane tab={v.cardTitle} key={i} className="navigation-tabpane">
-            {v.navCardItems.map(n => (
-              <Card
-                hoverable
-                key={n.id}
-                style={{ width: 300 }}
-                actions={[
-                  <EditOutlined
-                    onClick={() => {
-                      handleEdit(n)
-                    }}
-                  />,
-                  <Popconfirm title="确认删除该导航吗">
-                    <DeleteOutlined
+        {res.map((v, i) => (
+          <TabPane tab={v.name} key={i} className="navigation-tabpane">
+            {v.navItems.length === 0 ? (
+              <Empty style={{ gridColumn: '1 / 5' }} />
+            ) : (
+              v.navItems.map(n => (
+                <Card
+                  hoverable
+                  key={n.id}
+                  style={{ width: 300 }}
+                  actions={[
+                    <EditOutlined
                       onClick={() => {
-                        handleDelete(n.id)
+                        handleEdit(n)
                       }}
-                    />
-                  </Popconfirm>,
-                ]}
-              >
-                <Meta
-                  avatar={<Avatar src={n.iconSrc} />}
-                  title={
-                    <a href={n.itemLink} target="_blank">
-                      {n.itemTitle}
-                    </a>
-                  }
-                  description={n.itemDes}
-                />
-              </Card>
-            ))}
+                    />,
+                    <Popconfirm title="确认删除该导航吗">
+                      <DeleteOutlined
+                        onClick={() => {
+                          handleDelete(n.id)
+                        }}
+                      />
+                    </Popconfirm>,
+                  ]}
+                >
+                  <Meta
+                    avatar={<Avatar src={n.iconSrc} />}
+                    title={
+                      <a href={n.itemLink} target="_blank">
+                        {n.itemTitle}
+                      </a>
+                    }
+                    description={n.itemDes}
+                  />
+                </Card>
+              ))
+            )}
           </TabPane>
         ))}
       </Tabs>

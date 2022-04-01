@@ -63,7 +63,7 @@ const testData = [
 ]
 
 const Comment = () => {
-  const [res, loading]: [[CommentData[]], boolean] = useGetData([
+  const [res, loading]: [[CommentData[]], boolean, any] = useGetData([
     getCommentData,
   ])
 

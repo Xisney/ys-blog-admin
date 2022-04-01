@@ -10,6 +10,10 @@ import cx from 'classnames'
 
 import style from './style.module.less'
 import { removeGroup, updateGroup } from '@src/api/common'
+import {
+  removeNavigationGroupData,
+  updateNavigationGroupData,
+} from '@src/api/navgation'
 
 interface ListItem {
   label: string
@@ -57,7 +61,9 @@ const GroupListCard: FC<GroupListProps> = ({
     setCreateLoading(true)
     const {
       data: { code, newId },
-    } = await updateGroup({ label: newGroupLabel })
+    } = await (isNav
+      ? updateNavigationGroupData({ label: newGroupLabel })
+      : updateGroup({ label: newGroupLabel }))
 
     if (code === -1) {
       message.error('服务异常，新建分组失败')
@@ -88,7 +94,9 @@ const GroupListCard: FC<GroupListProps> = ({
 
     const {
       data: { code },
-    } = await updateGroup({ id, label: newGroupLabel })
+    } = await (isNav
+      ? updateNavigationGroupData({ id, label: newGroupLabel })
+      : updateGroup({ id, label: newGroupLabel }))
 
     if (code === -1) {
       message.error({ content: '服务异常，修改分组失败', key: changeMesKey })
@@ -124,7 +132,9 @@ const GroupListCard: FC<GroupListProps> = ({
         try {
           const {
             data: { code },
-          } = await removeGroup({ id })
+          } = await (isNav
+            ? removeNavigationGroupData({ id })
+            : removeGroup({ id }))
           if (code === -1) throw ' 删除分组失败'
 
           setData(
