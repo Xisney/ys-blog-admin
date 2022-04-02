@@ -1,14 +1,31 @@
 import { Button, Modal, message } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import MyEditor from '../write/components'
 
 import style from './style.module.less'
+import { getAboutContent, updateAboutContent } from '@src/api/about'
+import Loading from '@src/components/loading'
 
 const { confirm } = Modal
 
 const About = () => {
   const [aboutData, setAboutData] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getAboutContent()
+      .then(({ data: { code, data } }) => {
+        if (code === -1) throw '服务异常'
+        setAboutData(data)
+      })
+      .catch(e => {
+        message.error(e)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
 
   const handleUpdate = () => {
     confirm({
@@ -21,12 +38,14 @@ const About = () => {
       transitionName: '',
       onOk: async () => {
         try {
-          await new Promise<void>(resolve => {
-            setTimeout(() => {
-              resolve()
-            }, 2000)
-          })
-          message.success(`更新成功`)
+          const {
+            data: { code },
+          } = await updateAboutContent({ content: aboutData })
+          if (code === -1) {
+            message.error('服务异常，更新失败')
+          } else {
+            message.success(`更新成功`)
+          }
         } catch (e) {
           message.error(`服务异常${e}`)
         }
@@ -34,7 +53,9 @@ const About = () => {
       onCancel() {},
     })
   }
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <div className={style['about-container']}>
       <Button
         danger
