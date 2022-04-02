@@ -170,7 +170,10 @@ const Write = () => {
               showSearch
               placeholder="为文章选择分组"
               optionFilterProp="label"
-              options={res[0].data.groups}
+              options={res[0].data.groups.map(({ label, id }) => ({
+                label,
+                id,
+              }))}
               filterOption={(input, option: any) => {
                 return option
                   ? option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -201,8 +204,10 @@ const Write = () => {
                   blogIdRef.current === undefined ? '发布' : '修改并发布'
                 }文章吗`}
                 onConfirm={async () => {
-                  const value = await form.validateFields()
-                  await changeData(value, false)
+                  try {
+                    const value = await form.validateFields()
+                    await changeData(value, false)
+                  } catch {}
                 }}
               >
                 <Button type="primary" danger>
@@ -214,8 +219,10 @@ const Write = () => {
                   blogIdRef.current === undefined ? '暂存' : '修改并暂存'
                 }文章吗`}
                 onConfirm={async () => {
-                  const value = await form.validateFields()
-                  await changeData(value, true)
+                  try {
+                    const value = await form.validateFields()
+                    await changeData(value, true)
+                  } catch {}
                 }}
               >
                 <Button type="primary">暂存</Button>

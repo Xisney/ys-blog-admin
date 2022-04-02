@@ -128,32 +128,56 @@ const Navigation = () => {
         return
       }
 
-      setRes(
-        res?.map(nav => {
-          if (nav.id === pId) {
-            const items = nav.navItems.map(item => {
-              if (item.id === id) {
+      const newValue = {
+        id,
+        title: value.title,
+        description: value.description,
+        iconUrl: value.iconUrl,
+        url: value.url,
+      }
+
+      if (value.navgationGroup !== pId) {
+        setRes(
+          res?.map(nav => {
+            switch (nav.id) {
+              case pId:
+                const items = nav.navItems.filter(item => {
+                  return item.id !== id
+                })
                 return {
-                  id,
-                  title: value.title,
-                  description: value.description,
-                  iconUrl: value.iconUrl,
-                  url: value.url,
+                  ...nav,
+                  navItems: items,
                 }
-              }
-
-              return item
-            })
-
-            return {
-              ...nav,
-              navItems: items,
+              case value.navgationGroup:
+                return { ...nav, navItems: [...nav.navItems, newValue] }
+              default:
+                return nav
             }
-          }
+          })
+        )
+      } else {
+        setRes(
+          res?.map(nav => {
+            if (nav.id === value.navgationGroup) {
+              const items = nav.navItems.map(item => {
+                if (item.id === id) {
+                  return newValue
+                }
 
-          return nav
-        })
-      )
+                return item
+              })
+
+              return {
+                ...nav,
+                navItems: items,
+              }
+            }
+
+            return nav
+          })
+        )
+      }
+
       setConfirmLoading(false)
       setEditModalVisible(false)
       message.success('修改导航成功！')
