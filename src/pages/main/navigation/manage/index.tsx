@@ -4,12 +4,17 @@ import GroupListCard from '../../home/components/groupListCard'
 import NavItemForm from '../components/navItemForm'
 import style from './style.module.less'
 import Loading from '@src/components/loading'
-import { getNavigationGroupData, NavGroup } from '@src/api/navgation'
+import {
+  getNavigationGroupData,
+  NavGroup,
+  updateNavigation,
+} from '@src/api/navgation'
 
 const Manage = () => {
   const [loading, setLoading] = useState(true)
   const [form] = Form.useForm()
   const [data, setNavData] = useState<NavGroup[]>()
+  const [addLoading, setAddLoading] = useState(false)
 
   useEffect(() => {
     getNavigationGroupData()
@@ -25,6 +30,38 @@ const Manage = () => {
       })
   }, [])
 
+  const handleAddNav = async () => {
+    try {
+      const value = await form.validateFields()
+      const groupId = form.getFieldValue('navgationGroup')
+      setAddLoading(true)
+      const {
+        data: { code },
+      } = await updateNavigation({ ...value })
+
+      if (code === -1) {
+        message.error('服务异常，创建失败')
+        return
+      }
+
+      message.success('创建导航成功')
+      setNavData(
+        data?.map(d => {
+          if (d.id === groupId) {
+            return {
+              ...d,
+              count: d.count + 1,
+            }
+          }
+          return d
+        })
+      )
+    } catch {
+    } finally {
+      setAddLoading(false)
+    }
+  }
+
   return loading ? (
     <Loading />
   ) : (
@@ -34,6 +71,8 @@ const Manage = () => {
           form={form}
           isAdd
           selectOptions={data?.map(({ id, label }) => ({ id, label })) || []}
+          handleAddNav={handleAddNav}
+          addLoading={addLoading}
         />
       </div>
       <GroupListCard

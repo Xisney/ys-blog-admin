@@ -1,19 +1,31 @@
 import { NavGroup } from '@src/api/navgation'
 import { debouce } from '@src/utils'
 import { Form, Input, Avatar, Select, FormInstance, Button } from 'antd'
-import { FC, useState } from 'react'
+import { FC, MutableRefObject, useImperativeHandle, useState } from 'react'
 
 interface NavItemFormProps {
   form: FormInstance<any>
   isAdd?: boolean
   selectOptions: Omit<NavGroup, 'count'>[]
+  handleAddNav?: () => void
+  addLoading?: boolean
+  apisRef?: MutableRefObject<(data: string) => void>
 }
 
-const NavItemForm: FC<NavItemFormProps> = ({ form, isAdd, selectOptions }) => {
+const NavItemForm: FC<NavItemFormProps> = ({
+  form,
+  isAdd,
+  selectOptions,
+  handleAddNav,
+  addLoading,
+  apisRef,
+}) => {
   const [iconSrc, setIconSrc] = useState('')
   const handleIconSrcChange = debouce((e: any) => {
     setIconSrc(e.target.value)
   })
+
+  useImperativeHandle(apisRef, () => setIconSrc, [])
 
   return (
     <Form layout="vertical" form={form} autoComplete="off">
@@ -30,22 +42,26 @@ const NavItemForm: FC<NavItemFormProps> = ({ form, isAdd, selectOptions }) => {
         <Input />
       </Form.Item>
       <Form.Item
-        name="iconSrc"
+        name="iconUrl"
         label="图标地址"
         rules={[{ type: 'url', message: '输入的类型应为url' }]}
       >
         <Input
           onChange={handleIconSrcChange}
           addonBefore={
-            <Avatar src={iconSrc || form.getFieldValue('iconSrc')} />
+            <Avatar src={iconSrc || form.getFieldValue('iconUrl')} />
           }
         />
       </Form.Item>
-      <Form.Item name="description" label="描述">
+      <Form.Item
+        name="description"
+        label="描述"
+        rules={[{ required: true, message: '请输入描述' }]}
+      >
         <Input />
       </Form.Item>
       <Form.Item
-        name="link"
+        name="url"
         label="链接位置"
         rules={[
           {
@@ -57,7 +73,16 @@ const NavItemForm: FC<NavItemFormProps> = ({ form, isAdd, selectOptions }) => {
       >
         <Input />
       </Form.Item>
-      <Form.Item name="group" label="分组">
+      <Form.Item
+        name="navgationGroup"
+        label="分组"
+        rules={[
+          {
+            required: true,
+            message: '请选择导航分组',
+          },
+        ]}
+      >
         <Select
           fieldNames={{ label: 'label', value: 'id' }}
           showSearch
@@ -71,7 +96,12 @@ const NavItemForm: FC<NavItemFormProps> = ({ form, isAdd, selectOptions }) => {
       </Form.Item>
       {isAdd && (
         <Form.Item style={{ textAlign: 'center' }}>
-          <Button htmlType="submit" type="primary" style={{ width: '40%' }}>
+          <Button
+            type="primary"
+            style={{ width: '40%' }}
+            onClick={handleAddNav}
+            loading={addLoading}
+          >
             新建
           </Button>
         </Form.Item>

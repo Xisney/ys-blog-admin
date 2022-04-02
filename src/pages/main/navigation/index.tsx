@@ -1,5 +1,11 @@
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { getNavigationData, NavItem, NavsData } from '@src/api/navgation'
+import {
+  getNavigationData,
+  NavItem,
+  NavsData,
+  removeNavigation,
+  updateNavigation,
+} from '@src/api/navgation'
 import Loading from '@src/components/loading'
 import {
   Card,
@@ -12,7 +18,7 @@ import {
   Empty,
   message,
 } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavItemForm from './components/navItemForm'
 import style from './style.module.less'
@@ -23,6 +29,7 @@ const { TabPane } = Tabs
 const Navigation = () => {
   const [loading, setLoading] = useState(true)
   const [res, setRes] = useState<NavsData[]>()
+  const [confirmLoading, setConfirmLoading] = useState(false)
 
   useEffect(() => {
     getNavigationData()
@@ -42,33 +49,115 @@ const Navigation = () => {
   const [editModalVisible, setEditModalVisible] = useState(false)
   const [form] = Form.useForm()
 
-  const handleDelete = (id: number) => {}
+  const resetIconRef = useRef<(data: string) => void>(() => {})
 
-  const handleEdit = (n: NavItem) => {
+  const handleDelete = async (id: number, pId: number) => {
+    try {
+      const {
+        data: { code },
+      } = await removeNavigation({ id })
+      if (code === -1) throw '服务异常，删除失败'
+
+      setRes(
+        res?.map(nav => {
+          if (nav.id === pId) {
+            const items = nav.navItems.filter(({ id: cid }) => cid !== id)
+
+            return {
+              ...nav,
+              navItems: items,
+            }
+          }
+
+          return nav
+        })
+      )
+      message.success('成功删除该导航')
+    } catch (e) {
+      message.error(e as string)
+    }
+  }
+
+  const handleEdit = (n: NavItem, pId: number) => {
     setEditModalVisible(true)
     form.resetFields()
+    resetIconRef.current('')
     form.setFields([
       {
         name: 'title',
-        value: n.itemTitle,
+        value: n.title,
       },
       {
         name: 'description',
-        value: n.itemDes,
+        value: n.description,
       },
       {
-        name: 'link',
-        value: n.itemLink,
+        name: 'url',
+        value: n.url,
       },
       {
-        name: 'iconSrc',
-        value: n.iconSrc,
+        name: 'iconUrl',
+        value: n.iconUrl,
       },
       {
-        name: 'group',
-        value: '1',
+        name: 'navgationGroup',
+        value: pId,
       },
     ])
+    editIdRef.current = { id: n.id, pId }
+  }
+
+  const editIdRef = useRef<Record<string, number>>()
+  const handleSubmitEdit = async () => {
+    if (editIdRef.current === undefined) {
+      message.warning('id异常，请重试')
+      return
+    }
+
+    const { id, pId } = editIdRef.current
+    try {
+      const value = await form.validateFields()
+
+      setConfirmLoading(true)
+      const {
+        data: { code },
+      } = await updateNavigation({ ...value, id })
+
+      if (code === -1) {
+        message.error('服务异常，更新失败')
+        return
+      }
+
+      setRes(
+        res?.map(nav => {
+          if (nav.id === pId) {
+            const items = nav.navItems.map(item => {
+              if (item.id === id) {
+                return {
+                  id,
+                  title: value.title,
+                  description: value.description,
+                  iconUrl: value.iconUrl,
+                  url: value.url,
+                }
+              }
+
+              return item
+            })
+
+            return {
+              ...nav,
+              navItems: items,
+            }
+          }
+
+          return nav
+        })
+      )
+      setConfirmLoading(false)
+      setEditModalVisible(false)
+      message.success('修改导航成功！')
+    } catch {}
   }
 
   const renderTabs = useMemo(() => {
@@ -90,7 +179,7 @@ const Navigation = () => {
         }}
       >
         {res.map((v, i) => (
-          <TabPane tab={v.name} key={i} className="navigation-tabpane">
+          <TabPane tab={v.label} key={i} className="navigation-tabpane">
             {v.navItems.length === 0 ? (
               <Empty style={{ gridColumn: '1 / 5' }} />
             ) : (
@@ -98,30 +187,31 @@ const Navigation = () => {
                 <Card
                   hoverable
                   key={n.id}
-                  style={{ width: 300 }}
+                  style={{ width: 300, marginBottom: 15, cursor: 'default' }}
                   actions={[
                     <EditOutlined
                       onClick={() => {
-                        handleEdit(n)
+                        handleEdit(n, v.id)
                       }}
                     />,
-                    <Popconfirm title="确认删除该导航吗">
-                      <DeleteOutlined
-                        onClick={() => {
-                          handleDelete(n.id)
-                        }}
-                      />
+                    <Popconfirm
+                      title="确认删除该导航吗"
+                      onConfirm={async () => {
+                        await handleDelete(n.id, v.id)
+                      }}
+                    >
+                      <DeleteOutlined />
                     </Popconfirm>,
                   ]}
                 >
                   <Meta
-                    avatar={<Avatar src={n.iconSrc} />}
+                    avatar={<Avatar src={n.iconUrl} />}
                     title={
-                      <a href={n.itemLink} target="_blank">
-                        {n.itemTitle}
+                      <a href={n.url} target="_blank">
+                        {n.title}
                       </a>
                     }
-                    description={n.itemDes}
+                    description={n.description}
                   />
                 </Card>
               ))
@@ -143,15 +233,15 @@ const Navigation = () => {
         okText="提交"
         cancelText="取消"
         onCancel={() => {
-          // formIconRef.current?.setIconSrc('')
           setEditModalVisible(false)
         }}
+        onOk={handleSubmitEdit}
+        confirmLoading={confirmLoading}
       >
         <NavItemForm
+          apisRef={resetIconRef}
           form={form}
-          selectOptions={
-            res?.map(({ id, name }) => ({ id, label: name })) || []
-          }
+          selectOptions={res?.map(({ id, label }) => ({ id, label })) || []}
         />
       </Modal>
     </div>

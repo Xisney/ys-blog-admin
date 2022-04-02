@@ -60,7 +60,7 @@ const GroupListCard: FC<GroupListProps> = ({
 
     setCreateLoading(true)
     const {
-      data: { code, newId },
+      data: { code, data: newId },
     } = await (isNav
       ? updateNavigationGroupData({ label: newGroupLabel })
       : updateGroup({ label: newGroupLabel }))
