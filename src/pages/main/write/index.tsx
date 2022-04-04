@@ -21,6 +21,7 @@ import { getGroupAndTags, TagsAndGroupData } from '@src/api/common'
 import { getBlogContent, updateBlog } from '@src/api/write'
 import { useLocation } from 'react-router-dom'
 import { cacheBlog, clearCacheBlog, getBlogCache, targetKeys } from './utils'
+import { useTipClose } from './hooks'
 
 const { TextArea } = Input
 
@@ -93,6 +94,8 @@ const Write = () => {
         setSelfLoading(false)
       })
   }, [])
+
+  useTipClose()
 
   const [blogvalue, setBlogValue] = useState('')
   const [form] = Form.useForm()
