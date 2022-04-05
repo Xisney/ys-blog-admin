@@ -112,7 +112,7 @@ const Write = () => {
   }, [des, blogvalue])
 
   const changeData = async (value: any, isDraft: boolean) => {
-    if (value.tags.length > 3) {
+    if (value.tags && value.tags.length > 3) {
       message.warning('标签至多选择三个，请重新选择标签')
       return
     }
@@ -126,7 +126,9 @@ const Write = () => {
     const {
       data: { code, data },
     } = await updateBlog({
-      ...value,
+      title: value.title,
+      group: value.group,
+      tags: value.tags || [],
       description: des.content,
       content: blogvalue,
       isDraft,
@@ -210,7 +212,7 @@ const Write = () => {
                   try {
                     const value = await form.validateFields()
                     await changeData(value, false)
-                  } catch {}
+                  } catch (e) {}
                 }}
               >
                 <Button type="primary" danger>
