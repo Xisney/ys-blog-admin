@@ -3,6 +3,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 const apiInstance = axios.create({
   baseURL: 'http://localhost:3001/api/blog',
   timeout: 9000,
+  withCredentials: true,
 })
 
 export function httpRequest(url: string, config?: AxiosRequestConfig) {

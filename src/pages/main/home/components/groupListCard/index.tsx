@@ -131,11 +131,11 @@ const GroupListCard: FC<GroupListProps> = ({
       onOk: async () => {
         try {
           const {
-            data: { code },
+            data: { code, data: msg },
           } = await (isNav
             ? removeNavigationGroupData({ id })
             : removeGroup({ id }))
-          if (code === -1) throw ' 删除分组失败'
+          if (code === -1) throw msg || '服务异常 删除分组失败'
 
           setData(
             data.filter(d => {
@@ -143,8 +143,8 @@ const GroupListCard: FC<GroupListProps> = ({
             })
           )
           message.success(`成功删除 ${label} 分组`)
-        } catch (e) {
-          message.error(`服务异常${e}`)
+        } catch (e: any) {
+          message.error(e)
         }
       },
       onCancel() {},

@@ -30,7 +30,7 @@ const ShowCards: FC<ShowCardsProps> = ({
       <Card className="home-card-show" title="运行时间(天)" hoverable>
         <h2 className="home-number-box">{dayjs(runDays).toNow(true)}</h2>
       </Card>
-      <Card className="home-card-show" title="上次活动时间" hoverable>
+      <Card className="home-card-show" title="上次发布活动时间" hoverable>
         <h2 className="home-number-box">{dayjs(lastModify).fromNow()}</h2>
       </Card>
     </div>

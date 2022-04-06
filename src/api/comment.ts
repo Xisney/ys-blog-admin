@@ -1,19 +1,24 @@
-import { httpRequest } from '.'
+import { httpPostJsonRequest, httpRequest } from '.'
 
 export interface CommentData {
-  id: string
-  parentId: string
-  content: string
-  creator: {
+  code: number
+  data: {
+    id: number
+    parentId: number
+    content: string
     avatar: string
     nickname: string
-    mail: string
-    homePage: string
+    email: string
+    homepage: string
     isAdmin: boolean
-  }
-  publishTime: number
+    publishTime: string
+  }[]
 }
 
 export function getCommentData() {
-  return httpRequest('/getComment')
+  return httpRequest('/comment')
+}
+
+export function removeComment(data: { id: number }) {
+  return httpPostJsonRequest('/removeComment', data)
 }

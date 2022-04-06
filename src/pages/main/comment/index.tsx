@@ -1,78 +1,24 @@
-import { getCommentData, CommentData } from '@src/api/comment'
+import { getCommentData, CommentData, removeComment } from '@src/api/comment'
 import Loading from '@src/components/loading'
 import useGetData from '@src/hooks/useGetData'
-import { Popconfirm, Space, Table } from 'antd'
+import { message, Popconfirm, Space, Table } from 'antd'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
 import style from './style.module.less'
-
-const testData = [
-  {
-    id: '1',
-    parentId: '',
-    content: '发动机卡达开发',
-    creator: {
-      avatar: '',
-      nickname: 'sfdsf',
-      mail: '233423@qq.com',
-      homePage: 'sdfsfa',
-      isAdmin: false,
-    },
-    publishTime: 1647782010946,
-  },
-  {
-    id: '4',
-    parentId: '1',
-    content: '发动机卡达开发发动机卡zheshi4',
-    creator: {
-      avatar: '',
-      nickname: 'sfdsf',
-      mail: '233423@qq.com',
-      homePage: 'sdfsfa',
-      isAdmin: true,
-    },
-    publishTime: 1647502010946,
-  },
-  {
-    id: '2',
-    parentId: '1',
-    content: '发动机卡达开发发动机卡达开发发动机卡达开发发动机卡达开发',
-    creator: {
-      avatar: '',
-      nickname: 'sfdsf',
-      mail: '233423@qq.com',
-      homePage: 'sdfsfa',
-      isAdmin: true,
-    },
-    publishTime: 1647702010946,
-  },
-  {
-    id: '3',
-    parentId: '',
-    content: '发动机卡达开发',
-    creator: {
-      avatar: '',
-      nickname: 'sfdsf',
-      mail: '233423@qq.com',
-      homePage: '',
-      isAdmin: true,
-    },
-    publishTime: 1647781010946,
-  },
-]
+import { publishTimeCmp } from './utils'
 
 const Comment = () => {
-  const [res, loading]: [[CommentData[]], boolean, any] = useGetData([
+  const [res, loading, setData]: [[CommentData], boolean, any] = useGetData([
     getCommentData,
   ])
 
   const commentData = useMemo(() => {
     if (!res) return []
 
-    const originCommentList = testData
+    const originCommentList = res[0].data
     return originCommentList
-      .filter(c => c.parentId === '')
+      .filter(c => c.parentId === 0)
       .map(p => {
         const children = originCommentList.filter(
           ({ parentId }) => parentId === p.id
@@ -81,25 +27,42 @@ const Comment = () => {
           ? { ...p }
           : {
               ...p,
-              children: children.sort((a, b) => b.publishTime - a.publishTime),
+              children: children.sort(publishTimeCmp),
             }
       })
-      .sort((a, b) => b.publishTime - a.publishTime)
+      .sort(publishTimeCmp)
   }, [res])
+
+  const handleRemoveComment = async (id: number) => {
+    message.loading({ content: '操作中...', key: 'removeComment' })
+    const {
+      data: { code },
+    } = await removeComment({ id })
+
+    if (code === -1) {
+      message.error({ content: '服务异常，删除失败', key: 'removeComment' })
+      return
+    }
+
+    setData([{ data: res[0].data.filter(v => v.id !== id) }])
+
+    message.success({ content: '删除成功', key: 'removeComment' })
+  }
 
   const columns = [
     {
       title: '昵称',
-      dataIndex: ['creator', 'nickname'],
+      dataIndex: 'nickname',
       width: 250,
       render(v: string, r: any) {
-        const hompage = r.creator.homePage
-        return hompage ? <a href={hompage}>{v}</a> : v
+        const hompage = r.homepage
+        const showName = r.isAdmin ? `${v}(站长)` : v
+        return hompage ? <a href={hompage}>{showName}</a> : showName
       },
     },
     {
       title: '邮箱',
-      dataIndex: ['creator', 'mail'],
+      dataIndex: 'email',
       width: 240,
     },
     {
@@ -110,7 +73,8 @@ const Comment = () => {
       },
       width: 210,
       sortDirections: ['ascend'],
-      sorter: (a: any, b: any) => a.publishTime - b.publishTime,
+      sorter: (a: any, b: any) =>
+        new Date(a.publishTime).getTime() - new Date(b.publishTime).getTime(),
     },
     {
       title: '内容',
@@ -119,11 +83,16 @@ const Comment = () => {
     {
       title: '操作',
       key: 'opt',
-      render() {
+      render(_: any, r: any) {
         return (
           <Space size="middle" className="table-opts">
             <a>查看</a>
-            <Popconfirm title="确认删除该留言和所有回复吗？">
+            <Popconfirm
+              title="确认删除该留言和所有回复吗？"
+              onConfirm={() => {
+                handleRemoveComment(r.id)
+              }}
+            >
               <a>删除</a>
             </Popconfirm>
           </Space>
