@@ -15,11 +15,11 @@ dayjs.locale('zh-cn')
 ReactDOM.render(
   <Router>
     <ConfigProvider locale={zhCN}>
-      {/* <ErrorBoundary> */}
-      <RecoilRoot>
-        <App />
-      </RecoilRoot>
-      {/* </ErrorBoundary> */}
+      <ErrorBoundary>
+        <RecoilRoot>
+          <App />
+        </RecoilRoot>
+      </ErrorBoundary>
     </ConfigProvider>
   </Router>,
   document.querySelector('#root')
