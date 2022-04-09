@@ -13,7 +13,7 @@ import { RecoilRoot } from 'recoil'
 dayjs.locale('zh-cn')
 
 ReactDOM.render(
-  <Router>
+  <Router basename="admin">
     <ConfigProvider locale={zhCN}>
       <ErrorBoundary>
         <RecoilRoot>

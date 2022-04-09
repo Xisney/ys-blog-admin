@@ -2,6 +2,7 @@ import { PoemData } from '@src/api/home'
 import { Card } from 'antd'
 import { FC, useCallback } from 'react'
 import dayjs from 'dayjs'
+import ysImg from '../../static/ys.png'
 import style from './style.module.less'
 
 interface WelcomeCardProps {
@@ -48,7 +49,7 @@ const WelcomeCard: FC<WelcomeCardProps> = ({
   return (
     <Card hoverable className={style['home-welcome-card']}>
       <div className="home-card-welcome-inner">
-        <img src="/ys.png" alt="avatar" />
+        <img src={ysImg} alt="avatar" />
         <div className="home-welcome-wrapper">
           <h2>{renderWelcomeWord()}</h2>
           {`${content} --${dynasty} · ${author}`}

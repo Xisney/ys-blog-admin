@@ -6,6 +6,7 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), svgrPlugin()],
+  base: '/admin/',
   css: {
     modules: {
       generateScopedName: '[local]_[hash:4]',

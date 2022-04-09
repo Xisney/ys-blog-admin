@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
 const apiInstance = axios.create({
-  baseURL: 'http://localhost:3001/api/blog',
+  baseURL: 'http://47.107.76.201/api/blog',
   timeout: 9000,
   withCredentials: true,
 })
