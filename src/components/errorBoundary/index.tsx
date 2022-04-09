@@ -12,12 +12,14 @@ class ErrorBoundary extends Component {
   }
 
   render() {
-    return (
+    return this.state.hasError ? (
       <Result
         status="warning"
         title="发生错误，请联系管理员"
         className={style['errorBoundary-container']}
       />
+    ) : (
+      this.props.children
     )
   }
 }

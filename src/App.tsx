@@ -1,16 +1,18 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import Loading from './components/loading'
 import NotFound from './pages/404'
 import Main from './pages/main'
-import Login from './pages/login'
-
 import Home from './pages/main/home'
-import Comment from './pages/main/comment'
-import Blog from './pages/main/blog'
-import Navigation from './pages/main/navigation'
-import About from './pages/main/about'
-import Draft from './pages/main/draft'
-import Write from './pages/main/write'
-import Manage from './pages/main/navigation/manage'
+
+const Comment = lazy(() => import('./pages/main/comment'))
+const Blog = lazy(() => import('./pages/main/blog'))
+const Navigation = lazy(() => import('./pages/main/navigation'))
+const About = lazy(() => import('./pages/main/about'))
+const Draft = lazy(() => import('./pages/main/draft'))
+const Write = lazy(() => import('./pages/main/write'))
+const Manage = lazy(() => import('./pages/main/navigation/manage'))
+const Login = lazy(() => import('./pages/login'))
 
 const App = () => {
   return (
@@ -18,15 +20,71 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Main />}>
           <Route index element={<Home />} />
-          <Route path="blog" element={<Blog />} />
-          <Route path="comment" element={<Comment />} />
-          <Route path="navigation" element={<Navigation />} />
-          <Route path="navigation/manage" element={<Manage />} />
-          <Route path="about" element={<About />} />
-          <Route path="draft" element={<Draft />} />
-          <Route path="write" element={<Write />} />
+          <Route
+            path="blog"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Blog />
+              </Suspense>
+            }
+          />
+          <Route
+            path="comment"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Comment />
+              </Suspense>
+            }
+          />
+          <Route
+            path="navigation"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Navigation />
+              </Suspense>
+            }
+          />
+          <Route
+            path="navigation/manage"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Manage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="about"
+            element={
+              <Suspense fallback={<Loading />}>
+                <About />
+              </Suspense>
+            }
+          />
+          <Route
+            path="draft"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Draft />
+              </Suspense>
+            }
+          />
+          <Route
+            path="write"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Write />
+              </Suspense>
+            }
+          />
         </Route>
-        <Route path="login" element={<Login />} />
+        <Route
+          path="login"
+          element={
+            <Suspense fallback={<Loading />}>
+              <Login />
+            </Suspense>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
