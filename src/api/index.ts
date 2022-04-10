@@ -1,9 +1,15 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
+export const isDev = import.meta.env.DEV
+
+const baseURL = isDev
+  ? 'http://localhost:3001/api/blog'
+  : 'http://47.107.76.201/api/blog'
+
 const apiInstance = axios.create({
-  baseURL: 'http://47.107.76.201/api/blog',
+  baseURL,
   timeout: 9000,
-  withCredentials: true,
+  withCredentials: isDev,
 })
 
 export function httpRequest(url: string, config?: AxiosRequestConfig) {

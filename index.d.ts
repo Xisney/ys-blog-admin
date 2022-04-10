@@ -1,3 +1,15 @@
+interface ImportMetaEnv {
+  [key: string]: string | boolean | undefined
+  BASE_URL: string
+  MODE: string
+  DEV: boolean
+  PROD: boolean
+  SSR: boolean
+}
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
+
 declare module '*.module.less' {
   const obj: Record<string, string>
   export default obj
