@@ -4,6 +4,7 @@ import useGetData from '@src/hooks/useGetData'
 import { message, Popconfirm, Space, Table } from 'antd'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
+import { prodClientUrl } from '../consts'
 
 import style from './style.module.less'
 import { publishTimeCmp } from './utils'
@@ -86,7 +87,9 @@ const Comment = () => {
       render(_: any, r: any) {
         return (
           <Space size="middle" className="table-opts">
-            <a>查看</a>
+            <a href={prodClientUrl + 'comment'} target="_blank">
+              查看
+            </a>
             <Popconfirm
               title="确认删除该留言和所有回复吗？"
               onConfirm={() => {

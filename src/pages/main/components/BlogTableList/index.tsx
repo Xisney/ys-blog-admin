@@ -16,6 +16,7 @@ import { ColumnsType } from 'antd/es/table'
 import style from './style.module.less'
 import { SearchOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { prodClientUrl } from '../../consts'
 
 interface TableRecord {
   title: string
@@ -231,7 +232,11 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft, setData }) => {
               >
                 <a>删除</a>
               </Popconfirm>
-              {!isDraft && <a>阅读</a>}
+              {!isDraft && (
+                <a href={prodClientUrl + 'blog/' + r.id} target="_blank">
+                  阅读
+                </a>
+              )}
             </Space>
           )
         },

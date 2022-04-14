@@ -10,3 +10,5 @@ export const route2ActiveMenu: Record<string, string> = {
   draft: '6',
   write: customWriteActive,
 }
+
+export const prodClientUrl = 'http://47.107.76.201/'
