@@ -8,6 +8,7 @@ export const route2ActiveMenu: Record<string, string> = {
   'navigation/manage': '4',
   about: '5',
   draft: '6',
+  upload: '7',
   write: customWriteActive,
 }
 

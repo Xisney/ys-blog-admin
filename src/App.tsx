@@ -13,6 +13,7 @@ const Draft = lazy(() => import('./pages/main/draft'))
 const Write = lazy(() => import('./pages/main/write'))
 const Manage = lazy(() => import('./pages/main/navigation/manage'))
 const Login = lazy(() => import('./pages/login'))
+const Upload = lazy(() => import('./pages/main/upload'))
 
 const App = () => {
   return (
@@ -73,6 +74,14 @@ const App = () => {
             element={
               <Suspense fallback={<Loading />}>
                 <Write />
+              </Suspense>
+            }
+          />
+          <Route
+            path="upload"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Upload />
               </Suspense>
             }
           />

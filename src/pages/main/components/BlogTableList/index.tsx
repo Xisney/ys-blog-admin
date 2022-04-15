@@ -206,7 +206,11 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft, setData }) => {
               <Popconfirm
                 title="确认删除吗？"
                 onConfirm={async () => {
-                  message.loading({ content: '操作中', key: 'blogDelete' })
+                  message.loading({
+                    content: '操作中',
+                    key: 'blogDelete',
+                    duration: 0,
+                  })
                   const {
                     data: { code },
                   } = await deleteBlog({ id: r.id })

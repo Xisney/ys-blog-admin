@@ -90,7 +90,7 @@ const GroupListCard: FC<GroupListProps> = ({
       return
     }
 
-    message.loading({ content: '修改中...', key: changeMesKey })
+    message.loading({ content: '修改中...', key: changeMesKey, duration: 0 })
 
     const {
       data: { code },

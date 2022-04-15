@@ -1,0 +1,22 @@
+.upload-container {
+  :global {
+    .ant-upload-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .ant-upload-list-picture-container {
+      margin-right: 2%;
+      width: 48%;
+    }
+    .ant-upload-list-item {
+      background-color: #fff;
+      border: none;
+      transition: box-shadow 0.3s, border-color 0.3s;
+      &:hover {
+        background-color: #fff;
+        box-shadow: 0 1px 2px -2px rgb(0 0 0 / 16%),
+          0 3px 6px 0 rgb(0 0 0 / 12%), 0 5px 12px 4px rgb(0 0 0 / 9%);
+      }
+    }
+  }
+}

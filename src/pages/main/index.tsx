@@ -11,6 +11,7 @@ import {
   NotificationOutlined,
   HighlightOutlined,
   LogoutOutlined,
+  CloudUploadOutlined,
 } from '@ant-design/icons'
 import style from './style.module.less'
 import { Outlet, Link } from 'react-router-dom'
@@ -78,6 +79,9 @@ const Main = () => {
           </Menu.Item>
           <Menu.Item key="6" icon={<FileTextOutlined />}>
             <Link to="draft">草稿</Link>
+          </Menu.Item>
+          <Menu.Item key="7" icon={<CloudUploadOutlined />}>
+            <Link to="upload">上传</Link>
           </Menu.Item>
         </Menu>
       </Sider>

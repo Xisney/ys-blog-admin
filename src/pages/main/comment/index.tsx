@@ -35,7 +35,7 @@ const Comment = () => {
   }, [res])
 
   const handleRemoveComment = async (id: number) => {
-    message.loading({ content: '操作中...', key: 'removeComment' })
+    message.loading({ content: '操作中...', key: 'removeComment', duration: 0 })
     const {
       data: { code },
     } = await removeComment({ id })
