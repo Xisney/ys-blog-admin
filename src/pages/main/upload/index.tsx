@@ -24,16 +24,18 @@ const UploadPage = () => {
         if (code === -1) throw '服务异常，请求文件列表失败'
 
         setFiles(
-          data.map((s: string) => {
-            return {
-              name: s,
-              status: 'done',
-              thumbUrl: getAccessFileUrl(s),
-              url: getAccessFileUrl(s),
-              uid: s,
-              processFlag: true,
-            }
-          })
+          data
+            .map((s: string) => {
+              return {
+                name: s,
+                status: 'done',
+                thumbUrl: getAccessFileUrl(s),
+                url: getAccessFileUrl(s),
+                uid: s,
+                processFlag: true,
+              }
+            })
+            .reverse()
         )
       })
       .catch(e => {
