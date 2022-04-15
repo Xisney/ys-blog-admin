@@ -1,5 +1,5 @@
-import { UploadOutlined } from '@ant-design/icons'
-import { Button, message, Upload } from 'antd'
+import { ExclamationCircleOutlined, UploadOutlined } from '@ant-design/icons'
+import { Button, message, Upload, Modal } from 'antd'
 import {
   uploadAction,
   getFiles,
@@ -11,6 +11,8 @@ import { useEffect, useState } from 'react'
 import Loading from '@src/components/loading'
 import { UploadFile } from 'antd/es/upload/interface'
 import { downloadUrl } from '@src/utils'
+
+const { confirm } = Modal
 
 const UploadPage = () => {
   const [loading, setLoading] = useState(true)
@@ -47,17 +49,44 @@ const UploadPage = () => {
   }
 
   const handleFileRemove = async (file: any) => {
-    message.loading({ content: '删除中...', key: 'fileDelete', duration: 0 })
-    const {
-      data: { code },
-    } = await removeFile({ name: file.name })
+    let resolveFn: any
+    const guardPromise = new Promise<boolean>(resolve => {
+      resolveFn = resolve
+    })
 
-    if (code === -1) {
-      message.error({ content: '服务异常，删除失败', key: 'fileDelete' })
-      return false
-    }
+    confirm({
+      title: `确认删除该文件吗？`,
+      icon: <ExclamationCircleOutlined />,
+      content: '删除后文件将永久消失，请确保没有文章引用',
+      centered: true,
+      okType: 'danger',
+      maskClosable: true,
+      transitionName: '',
+      onOk: async () => {
+        message.loading({
+          content: '删除中...',
+          key: 'fileDelete',
+          duration: 0,
+        })
+        const {
+          data: { code },
+        } = await removeFile({ name: file.name })
 
-    message.success({ content: '成功删除文件', key: 'fileDelete' })
+        if (code === -1) {
+          message.error({ content: '服务异常，删除失败', key: 'fileDelete' })
+          resolveFn(false)
+          return
+        }
+
+        message.success({ content: '成功删除文件', key: 'fileDelete' })
+        resolveFn(true)
+      },
+      onCancel() {
+        resolveFn(false)
+      },
+    })
+
+    return guardPromise
   }
 
   const handleFileChange = (info: any) => {
