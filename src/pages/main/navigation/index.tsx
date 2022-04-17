@@ -211,7 +211,7 @@ const Navigation = () => {
                 <Card
                   hoverable
                   key={n.id}
-                  style={{ width: 300, marginBottom: 15, cursor: 'default' }}
+                  className="navigation-card"
                   actions={[
                     <EditOutlined
                       onClick={() => {
