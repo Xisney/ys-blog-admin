@@ -39,14 +39,17 @@ const BlogTableList: FC<BlogListProps> = ({ data, isDraft, setData }) => {
     const blogList = data
 
     return blogList.data
-      .map(({ title, publishTime, tags, group, id, description }) => ({
-        title,
-        publishTime,
-        tags,
-        group,
-        id,
-        description,
-      }))
+      .map(
+        ({ title, publishTime, tags, group, id, description, viewCount }) => ({
+          title,
+          publishTime,
+          tags,
+          group,
+          id,
+          description,
+          viewCount,
+        })
+      )
       .sort(
         (a, b) =>
           new Date(b.publishTime).getTime() - new Date(a.publishTime).getTime()

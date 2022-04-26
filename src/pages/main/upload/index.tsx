@@ -25,9 +25,9 @@ const UploadPage = () => {
 
         setFiles(
           data
-            .map((s: string) => {
+            .map(({ name: s, size }: { name: string; size: string }) => {
               return {
-                name: s,
+                name: s + '-' + size,
                 status: 'done',
                 thumbUrl: getAccessFileUrl(s),
                 url: getAccessFileUrl(s),
@@ -99,9 +99,9 @@ const UploadPage = () => {
         if (f.processFlag) return f
 
         if (f.status === 'done') {
-          const resName = f.response.data
+          const { name: resName, size } = f.response.data
           return {
-            name: resName,
+            name: resName + '-' + size,
             status: 'done',
             thumbUrl: getAccessFileUrl(resName),
             url: getAccessFileUrl(resName),

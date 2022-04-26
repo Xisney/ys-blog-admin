@@ -30,7 +30,7 @@ const Write = () => {
     getGroupAndTags,
   ])
   const [selfLoading, setSelfLoading] = useState(true)
-  const [publishLock, setPublishLock] = useState(false)
+  const publishLockRef = useRef(false)
 
   const blogIdRef = useRef()
   const { state }: { state: any } = useLocation()
@@ -117,12 +117,13 @@ const Write = () => {
       return
     }
 
+    const publishLock = publishLockRef.current
     if (publishLock) {
       message.warning(`操作进行中，请勿重复操作`)
       return
     }
 
-    setPublishLock(true)
+    publishLockRef.current = true
     const {
       data: { code, data },
     } = await updateBlog({
@@ -132,7 +133,7 @@ const Write = () => {
       description: des.content,
       content: blogvalue,
       isDraft,
-      viewCount: 0,
+      viewCount: state?.viewCount || 0,
       id: blogIdRef.current,
     })
     if (code === -1) {
@@ -143,7 +144,7 @@ const Write = () => {
       clearCacheBlog()
       hasPubOrSaveRef.current = true
     }
-    setPublishLock(false)
+    publishLockRef.current = false
   }
 
   return loading || selfLoading ? (
