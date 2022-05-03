@@ -70,9 +70,11 @@ const UploadPage = () => {
           key: 'fileDelete',
           duration: 0,
         })
+
+        const targetName = file.name.slice(0, file.name.lastIndexOf('-'))
         const {
           data: { code },
-        } = await removeFile({ name: file.name })
+        } = await removeFile({ name: targetName })
 
         if (code === -1) {
           message.error({ content: '服务异常，删除失败', key: 'fileDelete' })
