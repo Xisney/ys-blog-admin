@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import Loading from '@src/components/loading'
 import { UploadFile } from 'antd/es/upload/interface'
 import { downloadUrl } from '@src/utils'
+import { getRealFilename } from './utils'
 
 const { confirm } = Modal
 
@@ -47,7 +48,7 @@ const UploadPage = () => {
   }, [])
 
   const handleFileDownload = (file: any) => {
-    downloadUrl(file.url, file.name)
+    downloadUrl(file.url, getRealFilename(file.name))
   }
 
   const handleFileRemove = async (file: any) => {
@@ -71,7 +72,7 @@ const UploadPage = () => {
           duration: 0,
         })
 
-        const targetName = file.name.slice(0, file.name.lastIndexOf('-'))
+        const targetName = getRealFilename(file.name)
         const {
           data: { code },
         } = await removeFile({ name: targetName })
