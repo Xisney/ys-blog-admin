@@ -62,7 +62,7 @@ const MyEditor: FC<MyEditorProps> = ({ value, onChange }) => {
 
     message.success({ content: '上传成功', key: 'editorUpload' })
 
-    return [{ url: getAccessFileUrl(data) }]
+    return [{ url: getAccessFileUrl(data.name) }]
   }
 
   return (
