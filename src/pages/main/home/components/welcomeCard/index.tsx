@@ -32,7 +32,7 @@ const WelcomeCard: FC<WelcomeCardProps> = ({
           下午好，站起来走走吧<span>YS</span>
         </>
       )
-    if (h > 18 && h < 22)
+    if (h >= 18 && h < 22)
       return (
         <>
           晚上好，做一些自己喜欢的事情吧<span>YS</span>
